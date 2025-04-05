@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %} {% load socialaccount %} {% endcomment %}
+
+{% block css_files %}
+    <link rel="icon" href="{% static "justLap_main\images\JustLap Business Icon.jpg" type="image/png" sizes="27x27" %}">
+    <script src="https://kit.fontawesome.com/0a96adf822.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static "blog/index.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}
+
+{% block title %}
+    Chatbot
+{% endblock %}
+
+{% block content %}
+    {% comment %} for messages {% endcomment %}
+    <style>
+        body{
+            scroll-behavior: smooth;
+            overflow-y: visible;
+            background: #212f57;
+            color: white;
+        }
+        #chat-container{
+            border-top: 6px solid purple;
+            width: 100%;
+            height: 100%;
+            overflow-y: visible;
+        }
+        #label{
+            text-align: center;
+            font-size: 1.5em;
+            color: white;
+        }
+        form{
+            width: 90%;
+            margin-bottom: 70%;
+            position: fixed;
+            z-index: 1;
+        }
+        form #user-input{
+            height: 2em;
+            bottom: 0;
+            width: 35%;
+            border-radius: 2em;
+            font-size: 1em;
+        }
+        #send-btn{
+            height: 2.4em;
+            bottom: 0;
+            width: 10%;
+            border-radius: 2em; 
+            background: purple;
+            color: white;
+            font-size: 1em;
+        }
+        #send-btn:hover{
+            transition: 4s;
+            background: violet;
+            cursor: pointer;
+        }
+        form #user-input::placeholder, form #user-input::value{
+            margin-left: 5%;
+        }
+        .bottom{
+            z-index: 2;
+            top: 90%;
+            position: fixed;
+        }
+        #chat-display{
+            background: green:
+            width: 50%;
+            height: 2em;
+            margin-top: 2em;
+            overflow-y: visible;
+            margin-bottom: 2em;
+        }
+        .me{
+            padding: 1.5em;
+            width: 45%;
+            height: 3em;
+            margin-left: 50%;
+            margin-bottom: 2em;
+            background: green;
+            position: relative;
+            font-size: 1em;
+
+        }
+        .zillow, .updates{
+            padding: 1.5em;
+            width: 45%;
+            height: 8em;
+            margin-left: 50%;
+            margin-top: 4em;
+            margin-bottom: 3em;
+            background: purple;
+            font-size: 1em;
+        }
+        .user{
+            font-size: 1.1em;
+        }
+    </style>
+    <div id="chat-container">
+        <div id="label"><label>Codexio</label></div>
+        <div class="user">User: {{ user.username }}</div>
+        {% for updates in updates_zillow %}
+            <div class="updates">{{ updates.message }}</div>
+        {% endfor %}
+        <div id="chat-display"></div>
+        <div class="bottom"><footer>
+        <form action="javascript:void(0);" autocomplete="none">
+            <input type="text" id="user-input" placeholder="   Chat with Zillow...">
+            <input id="send-btn" type="submit" value="send">
+        <form></footer>
+        </div>
+        <script>
+            function submitForm() {
+                // Perform any validation or custom actions here
+    
+                // To prevent the form from submitting
+                // Remove the next line if you want the form to submit after validation
+                event.preventDefault();
+            }
+            alert("Welcome to Zillow chat bot space. I'm Zillow, your personal bot assistant. I will let you know if there are any updates. Most announcements would be made in the whatsapp community you're in. Updates made here will disappear automatically after five days.");
+        </script>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#send-btn").click(function() {
+                var userMessage = $("#user-input").val();
+                $("#chat-display").append("<div class=me>Me: " + userMessage + "</div>");
+                $("#user-input").val("");
+                
+                $.ajax({
+                    url: "/chatbot/",
+                    type: "POST",
+                    data: {
+                        'content': userMessage,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        var botResponse = data.response;
+                        $("#chat-display").append("<div class=zillow>Zillow: " + botResponse + "</div>");
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
