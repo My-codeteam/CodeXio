@@ -1,1 +1,5 @@
 Ignore the chatbot.html file. That file is for the chatbot itself. Then please do not modify the chatbot functionality on the views.py file.
+
+Please do not pull no matter what. The updated codes for this branch will be manually input in the main branch.
+
+Use the sub branch. In the sub branch you will see index.css, test.html and some image files. That's only for the sub branch.
