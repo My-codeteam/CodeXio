@@ -6,13 +6,6 @@ margin:0;
 body{
 background-color:black;
 }
-#home{
-display:flex;
-justify-content:center;
-flex-direction:column;
-align-items:center;
-height:400px;
-}
 .content{
 display:flex;
 justify-content:space-between;
@@ -26,4 +19,22 @@ font-size:1.5rem;
 p{
 font-size:1rem;
 font-weight: bold;
+}
+.quotes{
+border-radius:20%;
+border-bottom-right-radius:100%;
+border-top-left-radius:10%;
+height:350px;
+background-color:#b30000;
+width:95%;
+}
+.content{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+.article{
+ background-color:#b30000;
+ height:260px;
+margin-top:20%;
 }
