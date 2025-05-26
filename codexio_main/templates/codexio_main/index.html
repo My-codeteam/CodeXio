@@ -1,1 +1,203 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %} {% load socialaccount %} {% endcomment %}
 
+{% block css_files %}
+    <script src="https://kit.fontawesome.com/0a96adf822.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{% static "codexio_main/index.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+{% endblock %}
+
+{% block title %}
+    Codexio
+{% endblock %}
+
+{% block content %}
+<header>
+    <nav class="navbar navbar-expand-sm  navbar-dark bg-dark">
+    <div class="container">
+    <a href="#" class="navbar-brand"><span class="C">C</span>odexMingle.io</a>
+    <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navmenu">
+     <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navmenu">
+    <ul class="navbar-nav ms-auto">
+    <li class="nav-item">
+    <a href="#home" class="nav-link">Home</a>
+    </li>
+    <li class="nav-item">
+    <a href="#about" class="nav-link">About</a>
+    </li>
+    <li class="nav-item">
+    <a href="#contact" class="nav-link">Contact</a>
+    </li>
+    {% if not user.is_authenticated %}
+    <li>
+        <a href="#contact" class="nav-link">Login/Signup</a>
+    </li>
+    {% else %}
+    <li>
+        <a href="#contact" class="nav-link">Dashboard</a>
+    </li>
+    {% endif %}
+    </ul>
+    </div>
+    </div>
+    </nav>
+</header>
+<section class="container-fluid bg-dark" id="home">
+    <h1 class="display-1 mt-5 text-center text-light">Hello and Welcome</h1><br>
+    <p class="text-center text-light">to  codex.io the number one<br>best community for unique<br> developers.</p>
+    <br>
+    <button class="text-light join"><a href="#">JOIN OUR COMMUNITY</a></button>
+</section>
+<br>
+    
+<section class="container-fluid bg-dark" id="about">
+    <h3 class="text-light disply-1 text-center pt-4">Discover Our Identity</h3>
+    <div class="row g-4 align-items-center">
+        <div class="col-md-5">
+            <img src="{% static "codexio_main/images/coding-group.png" %}" class="img-fluid rounded" alt="Programmers">
+        </div>
+        <div class="col-md-7">
+            <p>We unite programmers, fostering a supportive community. Our purpose is to empower aspiring talents, enlighten newcomers, and create programming gurus.</p>
+            <div class="learn-more-div">
+                <button class="text-light mt-0 mb-3 learn-more"><a href="#">Learn more &rightarrow;</button>
+            </div>
+        </div>
+    </div>
+</section>
+<br>
+<section class="container-fluid bg-dark quote-section">
+    <div id="qouteCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="1900">
+        <div class="carousel-inner inner2">
+            <svg id="visual" viewBox="0 0 700 600" width="1200" height="600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"><rect x="0" y="0" width="900" height="600" fill="#282626"></rect><g transform="translate(448.0489702334559 308.67097781321957)"><path d="M155.2 -285.5C189 -249.2 196 -183.2 220.3 -130.7C244.7 -78.1 286.3 -39.1 306.6 11.7C326.9 62.5 325.8 125 290.8 159.1C255.8 193.1 186.9 198.8 132.8 226.5C78.7 254.3 39.3 304.1 -2.1 307.7C-43.5 311.3 -87 268.7 -131.3 235.3C-175.6 201.9 -220.7 177.7 -256.7 140C-292.6 102.3 -319.3 51.2 -315.7 2.1C-312.1 -47 -278.1 -94 -248.3 -142.2C-218.5 -190.4 -192.7 -239.8 -152 -272.2C-111.3 -304.5 -55.7 -319.8 2.5 -324.1C60.7 -328.4 121.3 -321.8 155.2 -285.5" fill="#c00000">
+            <div class="carousel-item active ci">
+                <!--make this a slider of three(that should do), but do not include slider arrows or dots-->
+                <q cite="#">Alone, we can do so little; together, we can do so much.</q>
+                <p>Remember that coding communities are built on the principle of collaboration. Embrace the power of teamwork and recognize that by working together, we can achieve far greater results than we ever could on our own.</p>
+                <br/><br/>
+                <p>~ Helen Keller</p>
+            </div>
+            <div class="carousel-item ci">
+                <q cite="#">Alne, we can do so little; together, we can do so much.</q>
+                <p>Remember that coding communities are built on the principle of collaboration. Embrace the power of teamwork and recognize that by working together, we can achieve far greater results than we ever could on our own.</p>
+                <br/><br/>
+                <p>~ Helen Keller</p>
+            </div>
+            <div class="carousel-item ci">
+                <q cite="#">Aloe, we can do so little; together, we can do so much.</q>
+                <p>Remember that coding communities are built on the principle of collaboration. Embrace the power of teamwork and recognize that by working together, we can achieve far greater results than we ever could on our own.</p>
+                <br/><br/>
+                <p>~ Helen Keller</p>
+            </div></path></g></svg>
+        </div>
+    </div>
+</section>
+<br>
+<section class="container-fluid bg-dark future">
+    <h2 class="display-3 text-light text-container pt-4 text-center">The Future With Us</h2>
+    <div class="big-img">
+        <!-- reference the vision.png image file for this -->
+        <img src="{% static "codexio_main/images/vision.png" %}" alt="pic" title="codexio"/>
+    </div>
+    <div class="vision">
+        <p>"Embrace your role as a visionary in the coding community, shaping the future throught your creations. Let your code be a testament to your ability to transform ideas into reality, as Peter Druker wisely said: 'The best way to predict the future is to create it.'"</p>
+    </div>
+    <button class="text-light mt-0 mb-3 learn-moreB"><a href="#">Learn more &rightarrow;</a></button>
+</section>
+<br>
+<section class="team bg-dark py-5 text-center">
+    <h2 class="display-4 text-light text-center">Our Accomplished Team</h2>
+    <div class="bg-danger carousel slide" data-bs-ride="carousel" id="images">
+        <div class="carousel-inner" style="width: 100%; height: 100%">
+            <!-- undecided, but the number of people in the group include their names. make it a slider of 9-->
+            <!-- include codes for the fonts icon that will hang on the image. use github icon instead of linkedin, the link will be updated by the backend teams -->
+            <div class="carousel-item active" data-bs-interval="1000">
+                <div>
+                    <img src="coding-group.png" alt="pic">
+                </div>
+                <h3 class="team-h3">John Doe</h3>
+                <p>Front-end Developer</p>
+            </div>
+            <div class="carousel-item">
+                <div>
+                    <img src="coding-group.png" alt="pic">
+                </div>
+                <h3 class="team-h3">Joh Doe</h3>
+                <p>Front-end Developer</p>
+            </div>
+            <div class="carousel-item">
+                <div>
+                    <img src="coding-group.png" alt="pic">
+                </div>
+                <h3 class="team-h3">John Do</h3>
+                <p>Front-end Developer</p>
+            </div>
+            <div class="carousel-item">
+                <div>
+                    <img src="coding-group.png" alt="pic">
+                </div>
+                <h3 class="team-h3">Jon Doe</h3>
+                <p>Front-end Developer</p>
+            </div>
+            <div class="carousel-item">
+                <div>
+                    <img src="coding-group.png" alt="pic">
+                </div>
+                <h3 class="team-h3">John oe</h3>
+                <p>Front-end Developer</p>
+            </div>
+            <div class="carousel-item">
+                <div>
+                    <img src="coding-group.png" alt="pic">
+                </div>
+                <h3 class="team-h3">John De</h3>
+                <p>Front-end Developer</p>
+            </div>
+            <div class="carousel-item">
+                <div>
+                    <img src="coding-group.png" alt="pic">
+                </div>
+                <h3 class="team-h3">John Doe</h3>
+                <p>Front-end Developer</p>
+            </div>
+            <div class="carousel-item">
+                <div>
+                    <img src="coding-group.png" alt="pic">
+                </div>
+                <h3 class="team-h3">ohn Doe</h3>
+                <p>Front-end Developer</p>
+            </div>
+            <button type="button" class="carousel-control-prev" data-bs-slide="prev" dataa-bs-target="#images">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button type="button" class="carousel-control-next" data-bs-slide="next" data-bs-target="#images">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#images" data-bs-slide-to="0" class="active">
+                </button>
+                <button type="button" data-bs-target="#images" data-bs-slide-to="1">
+                </button>
+                <button type="button" data-bs-target="#images" data-bs-slide-to="2">
+                </button>
+                <button type="button" data-bs-target="#images" data-bs-slide-to="3">
+                </button>
+                <button type="button" data-bs-target="#images" data-bs-slide-to="4">
+                </button>
+                <button type="button" data-bs-target="#images" data-bs-slide-to="5">
+                </button>
+                <button type="button" data-bs-target="#images" data-bs-slide-to="6">
+                </button>
+                <button type="button" data-bs-target="#images" data-bs-slide-to="7">
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+<footer></footer>
+
+{% endblock %}
