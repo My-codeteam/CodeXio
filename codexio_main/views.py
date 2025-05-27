@@ -9,7 +9,7 @@ from datetime import timedelta
 
 
 def home(request):
-    return render(request, templates/codexio_main/index)
+    return render(request, 'codexio_main/index.html')
 
 
 # Download the nltk data if not already downloaded
