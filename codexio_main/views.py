@@ -7,6 +7,11 @@ from .models import *
 from django.db.models.functions import Now
 from datetime import timedelta
 
+
+def home(request):
+    return render(request, templates/codexio_main/index)
+
+
 # Download the nltk data if not already downloaded
 nltk.download('punkt')
 
