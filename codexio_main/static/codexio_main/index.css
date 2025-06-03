@@ -47,9 +47,13 @@ h1, h2, h3 , h4{
 }
 .carousel-item img{
     border: 1em solid transparent;
-    border-radius: 7em;
-    width: 15%;
-    height: 15%;
+    border-radius: 8em;
+    width: 20%;
+    height: 23%;
+    -webkit-border-radius: 8em;
+    -moz-border-radius: 8em;
+    -ms-border-radius: 8em;
+    -o-border-radius: 8em;
 }
 .carousel-inner{
     height: 20%;
@@ -169,16 +173,21 @@ svg{
     background: transparent;
 }
 .our-team{
-    margin-bottom: 3em;;
+    margin-bottom: 3em;
+}
+.github{
+    height: 5em;
+    width: 2em;
 }
 .footer-sec{
     z-index: 9;
-    height: 20%;
-    width: 100%;
+    height: 10%;
+    width: 150em;
     background: black;
     display: block;
     position: fixed;
     bottom: 0;
+    margin-right: 2em;
 }
 @media screen and (min-height: 900px){
     .col-md-7{
@@ -264,6 +273,10 @@ svg{
     }
 }
 @media screen and (max-width: 720px){
+    .team p{
+        font-size: 0.8em;
+        font-weight: 600;
+    }
     .join{
         margin-left: 28%;
     }
@@ -333,6 +346,10 @@ svg{
     }
     #about{
         padding-bottom: 46em;
+    }
+    .carousel-item img{
+        width: 31%;
+        height: 31%;
     }
 }
 @media screen and (max-width: 544px){
