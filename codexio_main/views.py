@@ -121,6 +121,8 @@ chatbot_pairs = [
 ]
 def home(request):
     return render(request, 'codexio_main/index.html')
+def signup(request):
+    return render(request, 'codexio_main/signupform.html')
 
 def custom_404(request, exception):
     return render(request, 'codexio_main/404.html', status=404)
