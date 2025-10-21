@@ -46,14 +46,17 @@ h1, h2, h3 , h4{
     padding-top: 2em;
 }
 .carousel-item img{
+    background: black;
+    overflow: hidden;
+    object-fit: cover;
     border: 1em solid transparent;
-    border-radius: 8em;
+    border-radius: 50%;
     width: 20%;
-    height: 23%;
-    -webkit-border-radius: 8em;
-    -moz-border-radius: 8em;
-    -ms-border-radius: 8em;
-    -o-border-radius: 8em;
+    height: 9%;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    -ms-border-radius: 50%;
+    -o-border-radius: 50%;
 }
 .carousel-inner{
     height: 20%;
@@ -173,21 +176,20 @@ svg{
     background: transparent;
 }
 .our-team{
-    margin-bottom: 3em;
+    margin-bottom: 3.5em;
 }
-.github{
+/* .github{
     height: 5em;
     width: 2em;
-}
+} */
 .footer-sec{
     z-index: 9;
     height: 10%;
-    width: 150em;
+    width: 100%;
     background: black;
-    display: block;
     position: fixed;
     bottom: 0;
-    margin-right: 2em;
+    overflow: hidden;
 }
 @media screen and (min-height: 900px){
     .col-md-7{
@@ -348,8 +350,8 @@ svg{
         padding-bottom: 46em;
     }
     .carousel-item img{
-        width: 31%;
-        height: 31%;
+        width: 35%;
+        height: 35%;
     }
 }
 @media screen and (max-width: 544px){
@@ -398,4 +400,34 @@ svg{
         top: 14em;
         margin-left: 2em;
     }
+}
+/* .instagram{
+    position: absolute;
+    display: block;
+    border-radius: 50px;
+    width: 20%;
+    height: 20%;
+    margin-left: 52%;
+    margin-bottom: 25%;
+    z-index: 10%;
+    position: fixed;
+} */
+
+.twitter img, .gmail img{
+    width: 10%;
+    height: 10%;
+}
+
+.social-container{
+    overflow: hidden;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 15%;
+    padding-bottom: 0.6em;
+    height: 100%;
+}
+.youtube img{
+    width: 23%;
+    height: 23%;
 }

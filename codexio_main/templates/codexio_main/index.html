@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{% static "codexio_main/index.css" %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/> {% endcomment %}
 {% endblock %}
 
 {% block title %}
@@ -27,9 +28,6 @@
     </li>
     <li class="nav-item">
     <a href="#about" class="nav-link">About</a>
-    </li>
-    <li class="nav-item">
-    <a href="#contact" class="nav-link">Contact</a>
     </li>
     {% if not user.is_authenticated %}
     <li>
@@ -108,79 +106,63 @@
 </section>
 <br>
 <section class="team bg-dark py-5 text-center our-team">
-    <h2 class="display-4 text-light text-center">Our Accomplished Team</h2>
+    <h2 class="display-4 text-light text-center">Our Accomplished Team and Collaborators</h2>
     <div class="bg-danger carousel slide" data-bs-ride="carousel" id="images">
         <div class="carousel-inner team-inner" style="width: 100%; height: 100%">
             <!-- undecided, but the number of people in the group include their names. make it a slider of 9-->
             <!-- include codes for the fonts icon that will hang on the image. use github icon instead of linkedin, the link will be updated by the backend teams -->
             <div class="carousel-item active" data-bs-interval="1000">
-                <div>
-                    <img src="{% static "codexio_main/images/team-pics/team-5.png" %}" alt="pic">
-                    <a href="https://github.com/Bountukp20" class="instagram"><img src="{% static "codexio_main/images/social-icons/github-icon.png" %}"></a>
-                </div>
+                <a href="#" target="_blank"><img src="{% static "codexio_main/images/team-pics/team-5.png" %}" alt="pic"></a>
+                {% comment %} <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/social-link.png" %}"></a> {% endcomment %}
                 <h3 class="team-h3">Marvel Ukpong</h3>
                 <p>Python/Django Web Developer and Data Scientist and Analyst.</p>
                 <p>CEO and Founder of MarvCode and CodexMingle, Co-Founder Nexora.</p>
             </div>
             <div class="carousel-item">
-                <div>
-                    <img src="{% static "codexio_main/images/team-pics/team-4.png" %}" alt="pic">
-                    <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/Instagram-icon.png" %}"></a>
-                </div>
+                <a href="#" target="_blank"><img src="{% static "codexio_main/images/team-pics/team-4.png" %}" alt="pic"></a>
+                {% comment %} <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/social-link.png" %}"></a> {% endcomment %}
                 <h3 class="team-h3">Raphael Chigozie</h3>
                 <p>Digital Marketer and Chief Tech Organizer of CodexMingle. Co-Founder of CodexMingle.</p>
                 <p>Founder of Nexora</p>
             </div>
             <div class="carousel-item">
-                <div>
-                    <img src="#" alt="pic">
-                    <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/Instagram-icon.png" %}"></a>
-                </div>
+                <a href="#" target="_blank"><img src="#" alt="pic"></a>
+                {% comment %} <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/social-link.png" %}"></a> {% endcomment %}
                 <h3 class="team-h3">Samuel Oleru</h3>
-                <p>Front-end Developer and Business Manager.</p>
-                <p>Co-Founder of CodexMingle and Co-CTO</p>
             </div>
             <div class="carousel-item">
-                <div>
-                    <img src="{% static "codexio_main/images/team-pics/team-3.png" %}" alt="pic">
-                    <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/Instagram-icon.png" %}"></a>
-                </div>
-                <h3 class="team-h3">Michelle Nifemi</h3>
-                <p>Fullstack/Django Web Developer and Data Adminstrator and Analyst.</p>
-            </div>
-            <div class="carousel-item">
-                <div>
+                <div class="profile-pic">
                     <img src="{% static "codexio_main/images/team-pics/team-6.png" %}" alt="pic">
-                    <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/Instagram-icon.png" %}"></a>
+                    {% comment %} <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/social-link.png" %}"></a> {% endcomment %}
                 </div>
                 <h3 class="team-h3">Idris Olasunkanmi</h3>
                 <p>React Front-end Developer</p>
             </div>
             <div class="carousel-item">
-                <div>
-                    <img src="{% static "codexio_main/images/team-pics/team-1.png" %}" alt="pic">
-                    <a href="https://www.instagram.com/heis_nnamdi?igsh=YzljYTk1ODg3Zg==" class="instagram"><img src="{% static "codexio_main/images/social-icons/Instagram_icon.png" %}"></a>
-                </div>
+                <a href="#" target="_blank"><img src="{% static "codexio_main/images/team-pics/team-3.png" %}" alt="pic"></a>
+                {% comment %} <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/social-link.png" %}"></a> {% endcomment %}
+                <h3 class="team-h3">Michelle Nifemi</h3>
+                <p>Fullstack/Django Web Developer and Data Adminstrator and Analyst.</p>
+            </div>
+            <div class="carousel-item">
+                <a href="https://www.instagram.com/heis_nnamdi?igsh=YzljYTk1ODg3Zg==" target="_blank"><img src="{% static "codexio_main/images/team-pics/team-1.png" %}" alt="pic"></a>
+                {% comment %} <a href="https://www.instagram.com/heis_nnamdi?igsh=YzljYTk1ODg3Zg==" class="instagram"><img src="{% static "codexio_main/images/social-icons/social-link.png" %}"></a> {% endcomment %}
                 <h3 class="team-h3">Nnamdi Ndukwu</h3>
                 <p>React Front-end Developer</p>
             </div>
             <div class="carousel-item">
-                <div>
-                    <img src="{% static "codexio_main/images/team-pics/team-2.png" %}" alt="pic">
-                    <a href="#" class="instagram"><img src="{% static "codexio_main/images/social-icons/Instagram-icon.png" %}"></a>
-                </div>
+                <a href="#" target="_blank"><img src="{% static "codexio_main/images/team-pics/team-2.png" %}" alt="pic"></a>
+                {% comment %} <a href="#" cla<a href=ss="instagram"><img src="{% static "codexio_main/images/social-icons/social-link.png" %}"></a> {% endcomment %}
                 <h3 class="team-h3">Destiny Omorhienrhien</h3>
                 <p>Python/Django Developer</p>
             </div>
             <div class="carousel-item">
-                <div>
-                    <img src="#" alt="pic">
-                    <a href="#" class="instagram"><i class="fab fa-github"></li></a>
-                </div>
+                <a href="#" target="_blank"><img src="#" alt="pic"></a>
+                {% comment %} <a href="#" class="instagram"><i class="fab fa-github"></li></a> {% endcomment %}
                 <h3 class="team-h3">Michelle Rodrigues</h3>
                 <p>Python/Django Developer, Business Owner, Team Supporter of CodexMingle</p>
             </div>
-            <button type="button" class="carousel-control-prev" data-bs-slide="prev" dataa-bs-target="#images">
+            <button type="button" class="carousel-control-prev" data-bs-slide="prev" data-bs-target="#images">
                 <span class="carousel-control-prev-icon"></span>
             </button>
             <button type="button" class="carousel-control-next" data-bs-slide="next" data-bs-target="#images">
@@ -207,6 +189,13 @@
         </div>
     </div>
 </section>
-<footer class="footer-sec"></footer>
+<footer class="footer-sec">
+    <div class="social-container">
+        <div class="twitter"><a href="#"><img src="{% static "codexio_main/images/social-icons/twitter-icon.png" %}" alt="pic"></a></div>
+        <div class="gmail"><a href="#"><img src="{% static "codexio_main/images/social-icons/gmail-icon.png" %}" alt="pic"></a></div>
+        <div class="youtube"><a href="#"><img src="{% static "codexio_main/images/social-icons/youtube-icon.png" %}" alt="pic"></a></div>
+    </div>
+</footer>
 
 {% endblock %}
+
