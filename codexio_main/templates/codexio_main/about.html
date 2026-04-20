@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %} {% load socialaccount %} {% endcomment %}
+
+{% block css_files %}
+    {% comment %}<link rel="stylesheet" href="{% static "codexio_main/index.css" %}">{% endcomment %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/> {% endcomment %}
+{% endblock %}
+
+{% block title %}
+    CodexMingle|About
+{% endblock %}
+
+{% block content %}
+  <style>
+     /* ================= GLOBAL STYLES ================= */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: #121212;
+  color: #f5f5f5;
+  line-height: 1.7;
+}
+
+/* ================= NAVIGATION ================= */
+.navbar {
+  background: #1a1a1a;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 8%;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e63946;
+  letter-spacing: 1px;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #f5f5f5;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: #e63946;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-login,
+.btn-signup {
+  padding: 8px 18px;
+  text-decoration: none;
+  border-radius: 20px;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.btn-login {
+  color: #e63946;
+  border: 1px solid #e63946;
+}
+
+.btn-login:hover {
+  background: #e63946;
+  color: #fff;
+}
+
+.btn-signup {
+  background: #e63946;
+  color: #fff;
+}
+
+.btn-signup:hover {
+  background: #ff4d5a;
+}
+
+/* ================= HERO SECTION ================= */
+.about-hero {
+  background: linear-gradient(135deg, #e63946, #1a1a1a);
+  text-align: center;
+  padding: 100px 20px;
+}
+
+.about-hero h1 {
+  font-size: 2.6rem;
+  color: #fff;
+}
+
+.about-hero p {
+  color: #eaeaea;
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
+
+/* ================= CONTENT SECTIONS ================= */
+.container {
+  width: 85%;
+  max-width: 1000px;
+  margin: 60px auto;
+}
+
+h2 {
+  text-align: center;
+  color: #e63946;
+  margin-bottom: 15px;
+}
+
+p {
+  text-align: center;
+  color: #dcdcdc;
+}
+
+.about-offer ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.about-offer ul li {
+  background: #1e1e1e;
+  padding: 15px;
+  margin: 10px 0;
+  border-left: 4px solid #e63946;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+/* ================= JOIN SECTION ================= */
+.about-join {
+  background: #1a1a1a;
+  text-align: center;
+  padding: 60px 0;
+}
+
+.join-btn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 30px;
+  background: #e63946;
+  color: #fff;
+  border-radius: 25px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+  font-weight: 600;
+}
+
+.join-btn:hover {
+  background: #ff4d5a;
+}
+
+/* ================= FOOTER ================= */
+.about-footer {
+  background: #0d0d0d;
+  text-align: center;
+  padding: 25px;
+  color: #bcbcbc;
+  font-size: 0.9rem;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .about-hero h1 {
+    font-size: 2rem;
+  }
+
+  .join-btn {
+    width: 80%;
+  }
+  /* Dashboard button styling */
+  .dashboard-btn {
+    background: linear-gradient(135deg, #b30000, #ff1a1a);
+    padding: 0.6em 1.4em;
+    border-radius: 0.6em;
+    font-weight: bold;
+    color: #fff !important;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 8px rgba(255, 0, 0, 0.4);
+  }
+
+  .dashboard-btn:hover {
+     background: linear-gradient(135deg, #ff1a1a, #b30000);
+     box-shadow: 0 0 15px rgba(255, 26, 26, 0.6);
+     transform: scale(1.05);
+   }
+   .dashboard-btn {
+     animation: glow 2.5s infinite alternate;
+   }
+
+   @keyframes glow {
+     from { box-shadow: 0 0 8px rgba(255, 0, 0, 0.4); }
+     to { box-shadow: 0 0 18px rgba(255, 26, 26, 0.8); }
+   }
+  </style>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">CodexMingle</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      {% comment %}<li><a href="/join">Join</a></li>
+      <li><a href="/contact">Contact</a></li>{% endcomment %}
+    {% if not user.is_authenticated %}
+      <li><a href="/signup" class="btn-signup">Login/Sign-Up</a></li>
+    {% else %}
+      <li><a href="#" class="dashboard-btn">Dashboard</a></li>
+    {% endif %}
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="about-hero">
+    <div class="overlay">
+      <h1>About CodexMingle</h1>
+      <p>Empowering Learners. Building Together.</p>
+    </div>
+  </section>
+
+  <!-- About Content -->
+  <section class="about-content">
+    <div class="container">
+      <h2>Who We Are</h2>
+      <p>
+        At CodexMingle, we believe technology isn’t just about lines of code —
+        it’s about people, partnerships, and progress. We’re a community of
+        passionate learners, innovators, and collaborators building a shared
+        journey of growth in tech.
+      </p>
+    </div>
+  </section>
+
+  <section class="about-mission">
+    <div class="container">
+      <h2>Our Mission</h2>
+      <p>
+        To create a thriving environment where learning meets collaboration.
+        CodexMingle exists to unite learners, builders, and thinkers in the tech aspect to grow
+        and transform through innovation and teamwork.
+      </p>
+    </div>
+  </section>
+
+  <section class="about-offer">
+    <div class="container">
+      <h2>What We Offer</h2>
+      <ul>
+        <li>Hands-on learning in Web, AI/ML, and Design.</li>
+        <li>Collaborative real-world projects and mentorship.</li>
+        <li>Inclusive, supportive, and growth-focused environment.</li>
+        <li>Community-driven initiatives that empower every member.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="about-join">
+    <div class="container">
+      <h2>Join Our Movement</h2>
+      <p>
+        Whether you’re starting out or scaling up, CodexMingle is where your
+        journey connects with purpose. Join us and become part of something
+        extraordinary.
+      </p>
+      <a href="https://www.facebook.com/groups/818235673928065/?ref=share&mibextid=NSMWBT" target="_blank" class="join-btn">Join Our Community</a>
+    </div>
+  </section>
+
+  <footer class="about-footer">
+    <p>© 2025 CodexMingle — Together we learn. Together we build.</p>
+  </footer>
+{% endblock %}

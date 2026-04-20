@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %} {% load socialaccount %} {% endcomment %}
+
+{% block css_files %}
+    <link rel="stylesheet" href="{% static "codexio_main/index.css" %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/> {% endcomment %}
+{% endblock %}
+
+{% block title %}
+    CodexMingle
+{% endblock %}
+
+{% block content %}
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .form-toggle-container {
+      background: #1a1a1a;
+      padding: 2em;
+      border-radius: 1em;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .toggle-buttons {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1.5em;
+    }
+
+    .toggle-buttons button {
+      background: #b30000;
+      border: none;
+      color: white;
+      padding: 0.7em 1.5em;
+      margin: 0 0.5em;
+      border-radius: 0.5em;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-buttons button:hover {
+      background: #ff1a1a;
+    }
+
+    .form-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-box form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-box input {
+      padding: 0.8em;
+      margin-bottom: 1em;
+      border: none;
+      border-radius: 0.4em;
+      background: #333;
+      color: white;
+    }
+
+    .form-box button {
+      padding: 0.8em;
+      background: #b30000;
+      border: none;
+      border-radius: 0.4em;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .form-box button:hover {
+      background: #ff1a1a;
+    }
+
+    .hidden {
+      display: none;
+    }
+    /* Disable button interaction and make it look inactive */
+.form-box button:disabled {
+  background: #555;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Style for info message */
+.info-box {
+  background: #262626;
+  color: #ff6666;
+  border: 1px solid #b30000;
+  padding: 0.8em;
+  margin-top: 1em;
+  border-radius: 0.5em;
+  text-align: center;
+  font-size: 0.9em;
+}
+  </style>
+
+  <div class="form-toggle-container">
+    <!-- Toggle Buttons -->
+    <div class="toggle-buttons">
+      <button onclick="showLogin()">Login</button>
+      <button onclick="showRegister()">Register</button>
+    </div>
+
+    <div id="login-form" class="form-box">
+      <h2>Login</h2>
+      <form>
+        <input type="text" placeholder="Username" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" disabled>Login</button>
+      </form>
+    </div>
+
+    <div id="register-form" class="form-box hidden">
+      <h2>Register</h2>
+      <form>
+        <input type="text" placeholder="Username" required>
+        <input type="email" placeholder="Email" required>
+        <input type="password" placeholder="Password" required>
+        <button type="submit" disabled>Register</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function showLogin() {
+      document.getElementById('login-form').classList.remove('hidden');
+      document.getElementById('register-form').classList.add('hidden');
+    }
+
+    function showRegister() {
+      document.getElementById('register-form').classList.remove('hidden');
+      document.getElementById('login-form').classList.add('hidden');
+    }
+    // Disable all form buttons
+    document.querySelectorAll('.form-box button').forEach(btn => {
+      btn.disabled = true;
+    });
+
+    // Add info box message
+    const info = document.createElement('div');
+    info.className = 'info-box';
+    info.innerText = "⚠️ Registration and Login are temporarily unavailable. Please check back soon.";
+    document.querySelector('.form-toggle-container').appendChild(info);
+  </script>
+
+{% endblock %}

@@ -1,0 +1,1 @@
+Ignore the chatbot.html file. That file is for the chatbot itself. Then please do not modify the chatbot functionality on the views.py file.

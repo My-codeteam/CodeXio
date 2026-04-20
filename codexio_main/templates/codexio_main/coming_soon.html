@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+ Coming Soon | Codexmingle
+{% endblock %}
+
+{% block content %}
+ <style>
+     body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#0c1117;
+font-family:Segoe UI;
+overflow:hidden;
+}
+
+/* COMING SOON TEXT */
+
+.coming-soon{
+font-size:70px;
+font-weight:bold;
+color:#ff3b3b;
+letter-spacing:4px;
+text-align:center;
+animation:fadePulse 2s ease-in-out infinite;
+}
+
+/* ANIMATION */
+
+@keyframes fadePulse{
+
+0%{
+opacity:0.4;
+transform:scale(0.95);
+}
+
+50%{
+opacity:1;
+transform:scale(1);
+}
+
+100%{
+opacity:0.4;
+transform:scale(0.95);
+}
+
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.coming-soon{
+font-size:40px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="coming-soon">
+COMING SOON...
+</div>
+
+{% endblock %}
