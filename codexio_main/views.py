@@ -158,8 +158,8 @@ def get_chatbot_response(user_message):
     chatbot = Chat(chatbot_pairs, reflections)
     return chatbot.respond(user_message)
 
-
-
+def student_portal(request):
+    return render(request, 'codexio_main/dashboard/dashboard.html')
 
 
 
