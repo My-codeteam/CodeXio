@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.container{
+max-width:1200px;
+margin:auto;
+padding:40px 20px;
+}
+
+.search-bar{
+display:flex;
+gap:10px;
+margin-bottom:30px;
+flex-wrap:wrap;
+}
+
+.search-bar input{
+padding:10px;
+flex:1;
+border-radius:6px;
+border:1px solid #ccc;
+}
+
+.search-bar button{
+padding:10px 20px;
+background:#ff3b3b;
+border:none;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.filter-btn{
+background:#222;
+color:white;
+padding:10px 15px;
+border-radius:6px;
+text-decoration:none;
+}
+
+.course-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:25px;
+}
+
+.course-card{
+background:#111826;
+padding:20px;
+border-radius:10px;
+border:1px solid #1f2933;
+text-decoration:none;
+color:white;
+transition:0.3s;
+}
+
+.course-card:hover{
+transform:translateY(-5px);
+}
+
+.price{
+color:#ff3b3b;
+font-weight:bold;
+margin-top:10px;
+}
+
+</style>
+
+
+<div class="container">
+
+<h1>All Courses</h1>
+
+
+<form method="GET" class="search-bar">
+
+<input type="text" name="search" placeholder="Search courses">
+
+<button type="submit">Search</button>
+
+<a href="?free=true" class="filter-btn">Free Courses</a>
+
+<a href="{% url 'course_list' %}" class="filter-btn">All</a>
+
+</form>
+
+
+<div class="course-grid">
+
+{% for course in courses %}
+
+<a href="{% url 'course_detail' course.id %}" class="course-card">
+
+<h3>{{course.title}}</h3>
+
+<p>{{course.description|truncatewords:20}}</p>
+
+{% if course.price == 0 %}
+<div class="price">Free</div>
+{% else %}
+<div class="price">₦{{course.price}}</div>
+{% endif %}
+
+</a>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endblock %}

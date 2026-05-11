@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="Message",
+            name="Assignment",
             fields=[
                 (
                     "id",
@@ -22,12 +22,13 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("content", models.TextField()),
-                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                ("title", models.CharField(max_length=200)),
+                ("description", models.TextField()),
+                ("is_live", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name="Update",
+            name="Submission",
             fields=[
                 (
                     "id",
@@ -38,8 +39,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("message", models.TextField()),
-                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                ("file", models.FileField(upload_to="submissions/")),
+                ("grade", models.CharField(blank=True, max_length=10)),
+                ("feedback", models.TextField(blank=True)),
+                ("submitted_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
     ]

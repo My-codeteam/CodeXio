@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.container{
+max-width:900px;
+margin:auto;
+padding:40px 20px;
+}
+
+.assignment{
+background:#111826;
+padding:20px;
+border-radius:10px;
+margin-top:30px;
+border:1px solid #1f2933;
+}
+
+.submit-btn{
+background:#ff3b3b;
+border:none;
+padding:10px 20px;
+color:white;
+border-radius:6px;
+margin-top:10px;
+}
+
+</style>
+
+<div class="container">
+
+<h1>{{module.title}}</h1>
+
+<p>{{module.content}}</p>
+
+
+{% if assignment %}
+
+<div class="assignment">
+
+<h3>Assignment</h3>
+
+<p>{{assignment.description}}</p>
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+<input type="file" name="submission">
+
+<button class="submit-btn">
+Submit Assignment
+</button>
+
+</form>
+
+</div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

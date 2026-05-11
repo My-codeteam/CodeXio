@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+
+.container{
+max-width:900px;
+margin:auto;
+padding:40px 20px;
+}
+
+.module-card{
+background:#111826;
+padding:15px;
+border-radius:8px;
+margin-bottom:10px;
+border:1px solid #1f2933;
+}
+
+.module-card a{
+color:white;
+text-decoration:none;
+}
+
+.enroll-btn{
+margin-top:20px;
+padding:12px 25px;
+background:#ff3b3b;
+border:none;
+color:white;
+border-radius:6px;
+}
+
+</style>
+
+
+<div class="container">
+
+<h1>{{course.title}}</h1>
+
+<p>{{course.description}}</p>
+
+{% if course.price == 0 or enrolled %}
+
+<h3>Modules</h3>
+
+{% for module in modules %}
+
+<div class="module-card">
+
+<a href="{% url 'module_detail' module.id %}">
+{{module.title}}
+</a>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<h3>Course Price: ₦{{course.price}}</h3>
+
+<form method="POST" action="{% url 'payments:initiate_payment' course.id %}">
+{% csrf_token %}
+<input type="hidden" name="course_id" value="{{course.id}}">
+<button class="enroll-btn">Enroll Now</button>
+</form>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

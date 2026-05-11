@@ -289,8 +289,8 @@ font-size:14px;
 
 <h2>CodexMingle</h2>
 
-<a href="#">Dashboard</a>
-<a href="#">Courses</a>
+<a href="/student_portal">Dashboard</a>
+<a href="{% url 'course_list' %}">Courses</a>
 <a href="#">Assignments</a>
 <a href="#">Ebooks</a>
 <a href="#">Community</a>
@@ -326,22 +326,22 @@ M
 <div class="cards">
 
 <div class="card">
-<h3>2,450</h3>
+<h3>{{ total_members }}</h3>
 <p>Total Members</p>
 </div>
 
 <div class="card">
-<h3>24</h3>
+<h3>{{ total_courses }}</h3>
 <p>Total Courses</p>
 </div>
 
 <div class="card">
-<h3>3</h3>
+<h3>{{ courses_enrolled }}</h3>
 <p>Your Enrolled Courses</p>
 </div>
 
 <div class="card">
-<h3>126</h3>
+<h3>{{ total_repos }}</h3>
 <p>Active Projects</p>
 </div>
 
@@ -357,37 +357,14 @@ M
 
 <div class="course-grid">
 
+{% for course in courses %}
 <div class="course-card">
-<h4>HTML & CSS Fundamentals</h4>
-<p>Beginner web development</p>
+<a href=""
+<h4>{{ course.title }}</h4>
+<p>{{ course.description }}</p>
 </div>
+{% endfor %}
 
-<div class="course-card">
-<h4>JavaScript Mastery</h4>
-<p>Interactive web apps</p>
-</div>
-
-<div class="course-card">
-<h4>Python Programming</h4>
-<p>Core programming skills</p>
-</div>
-
-<div class="course-card">
-<h4>Django Web Development</h4>
-<p>Build scalable apps</p>
-</div>
-
-<div class="course-card">
-<h4>MySQL Database</h4>
-<p>Data management</p>
-</div>
-
-<div class="course-card">
-<h4>Machine Learning Intro</h4>
-<p>AI basics</p>
-</div>
-
-</div>
 
 </div>
 
@@ -459,6 +436,13 @@ You can ask:
 • Where are ebooks
 • How to get certificates
 • How to join community
+<p>
+{% if update == null %}
+And I alert you on any updates to the site
+{% else %}
+{{ updates }}
+{% endif %}
+</p>
 
 </div>
 

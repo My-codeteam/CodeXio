@@ -1,11 +1,21 @@
 import nltk
 
 from nltk.chat.util import Chat, reflections
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import *
+from users.models import User
 from django.db.models.functions import Now
 from datetime import timedelta
+import requests
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+from courses.models import Course, Enrollment
+from django.contrib.auth import authenticate, login
+
+
 
 # Download the nltk data if not already downloaded
 nltk.download('punkt')
@@ -121,8 +131,6 @@ chatbot_pairs = [
 ]
 def home(request):
     return render(request, 'codexio_main/index.html')
-def signup(request):
-    return render(request, 'codexio_main/signupform.html')
 
 def custom_404(request, exception):
     return render(request, 'codexio_main/404.html', status=404)
@@ -158,9 +166,84 @@ def get_chatbot_response(user_message):
     chatbot = Chat(chatbot_pairs, reflections)
     return chatbot.respond(user_message)
 
+@login_required
 def student_portal(request):
-    return render(request, 'codexio_main/dashboard/dashboard.html')
+    total_courses = Course.objects.count()
+
+    total_members = User.objects.count()
+
+    courses_enrolled = Enrollment.objects.filter(
+        user=request.user
+    ).count()
+
+    courses = Course.objects.all()
+
+    updates = Update.objects.all()
+
+    # GitHub repos
+    url = "https://api.github.com/orgs/CodexMingle/repos"
+
+    response = requests.get(url)
+
+    repos = response.json()
+
+    total_repos = len(repos)
+
+    context = {
+
+        "total_courses": total_courses,
+
+        "total_members": total_members,
+
+        "courses_enrolled": courses_enrolled,
+
+        "total_repos": total_repos,
+
+        "updates": updates,
+
+        "courses": courses
+
+    }
+
+    return render(request, 'codexio_main/dashboard/dashboard.html', context)
 
 
+def signup(request):
+
+    if request.method == "POST" and "signup_submit" in request.POST:
+
+        username = request.POST['username']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        country = request.POST['country']
+        password = request.POST['password']
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            phone=phone,
+            country=country,
+            password=password
+        )
+
+        user.save()
+
+    return render(request, "codexio_main/signupform.html")
+
+
+def login_view(request):
+
+    if request.method == "POST" and "login_submit" in request.POST:
+
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(request, username=username, password=password)
+
+        if user:
+            login(request, user)
+            return redirect("/student_portal")
+
+    return render(request, "codexio_main/signupform.html")
 
 
