@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Course, Module, Enrollment, Progress
 from assignments.models import Assignment
-
+from django.contrib.auth.decorators import login_required
+from django.db.models import Exists, OuterRef
 
 def course_list(request):
 
@@ -9,6 +10,16 @@ def course_list(request):
     free = request.GET.get("free")
 
     courses = Course.objects.all()
+
+    if request.user.is_authenticated:
+        enrollments = Enrollment.objects.filter(
+            user=request.user,
+            course=OuterRef("pk")
+        )
+
+        courses = courses.annotate(
+            enrolled=Exists(enrollments)
+        )
 
     if search:
         courses = courses.filter(title__icontains=search)
@@ -28,18 +39,17 @@ def course_detail(request, course_id):
     course = get_object_or_404(Course, id=course_id)
     modules = course.modules.all()
 
-    enrolled = False
+    enrolled_course = []
 
     if request.user.is_authenticated:
-        enrolled = Enrollment.objects.filter(
-            user=request.user,
-            course=course
-        ).exists()
+        enrolled_course = Enrollment.objects.filter(
+            user=request.user
+    ).values_list("course_id", flat=True)
 
     context = {
         "course": course,
         "modules": modules,
-        "enrolled": enrolled
+        "enrolled_course": enrolled_course
     }
 
     return render(request, "courses/course_detail.html", context)
@@ -83,3 +93,23 @@ def complete_module(request, module_id):
     )
 
     return redirect("course_modules", id=module.course.id)
+
+
+@login_required
+def enroll_course(request, course_id):
+
+    course = Course.objects.get(id=course_id)
+
+    # If free course
+    if course.price == 0:
+
+        Enrollment.objects.get_or_create(
+            user=request.user,
+            course=course
+        )
+
+        return redirect("course_detail", course_id=course.id)
+
+    # If paid course → redirect to payment
+    else:
+        return redirect("payments:initiate_payment", course_id=course.id)

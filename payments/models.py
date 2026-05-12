@@ -15,6 +15,8 @@ class Payment(models.Model):
 
     reference = models.CharField(max_length=200)
 
-    status = models.CharField(max_length=20)
+    tx_ref = models.CharField(max_length=100, blank=True)
+
+    status = models.CharField(max_length=20, default="pending")
 
     created = models.DateTimeField(auto_now_add=True)

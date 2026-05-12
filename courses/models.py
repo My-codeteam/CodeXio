@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -25,6 +26,9 @@ class Module(models.Model):
 
     order = models.IntegerField()
 
+    class Meta:
+        ordering = ["order"]
+
 
 class Enrollment(models.Model):
 
@@ -36,6 +40,9 @@ class Enrollment(models.Model):
 
     enrolled_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ['user', 'course']
+
 
 class Progress(models.Model):
 
@@ -46,3 +53,6 @@ class Progress(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
 
     completed = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ['user', 'module']

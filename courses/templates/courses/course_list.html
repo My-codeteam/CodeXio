@@ -91,7 +91,7 @@ margin-top:10px;
 
 {% for course in courses %}
 
-<a href="{% url 'course_detail' course.id %}" class="course-card">
+<div class="course-card">
 
 <h3>{{course.title}}</h3>
 
@@ -102,8 +102,16 @@ margin-top:10px;
 {% else %}
 <div class="price">₦{{course.price}}</div>
 {% endif %}
+{% if course.enrolled %}
 
-</a>
+<a href="{% url 'course_detail' course.id %}" class="btn btn-primary">View</a>
+
+{% else %}
+<a href="{% url 'enroll_course' course.id %}" class="btn btn-primary">Enroll now</a>
+
+{% endif %}
+
+</div>
 
 {% endfor %}
 

@@ -176,7 +176,7 @@ def student_portal(request):
         user=request.user
     ).count()
 
-    courses = Course.objects.all()
+    courses = Course.objects.order_by('-id')[:6]
 
     updates = Update.objects.all()
 
