@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Course, Module, Enrollment, Progress
-from assignments.models import Assignment
+from assignments.models import Assignment, Submission
 from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef
 
@@ -37,7 +37,24 @@ def course_list(request):
 def course_detail(request, course_id):
 
     course = get_object_or_404(Course, id=course_id)
+
     modules = course.modules.all()
+
+    assignments = Assignment.objects.filter(module__course=course)
+
+    submissions = Submission.objects.filter(
+        student=request.user,
+        assignment__in=assignments
+    )
+
+    progress = Progress.objects.filter(
+        user=request.user,
+        course=course
+    )
+
+    # Attendance for live courses
+    sessions = course.classsession_set.all()
+
 
     enrolled_course = []
 
@@ -49,7 +66,11 @@ def course_detail(request, course_id):
     context = {
         "course": course,
         "modules": modules,
-        "enrolled_course": enrolled_course
+        "enrolled_course": enrolled_course,
+        "progress": progress,
+        "submissions": submissions,
+        "assignments": assignments,
+        "sessions": sessions
     }
 
     return render(request, "courses/course_detail.html", context)
@@ -92,7 +113,7 @@ def complete_module(request, module_id):
         completed=True
     )
 
-    return redirect("course_modules", id=module.course.id)
+    return redirect("course_detail", course_id=module.course.id)
 
 
 @login_required
@@ -113,3 +134,23 @@ def enroll_course(request, course_id):
     # If paid course → redirect to payment
     else:
         return redirect("payments:initiate_payment", course_id=course.id)
+
+
+@login_required
+def submit_assignment(request, assignment_id):
+
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+
+    if request.method == "POST":
+
+        file = request.FILES.get("file")
+
+        Submission.objects.update_or_create(
+            assignment=assignment,
+            student=request.user,
+            defaults={
+                "file": file
+            }
+        )
+
+    return redirect("courses:course_detail", course_id=assignment.module.course.id)

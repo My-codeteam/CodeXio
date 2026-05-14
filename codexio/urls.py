@@ -24,4 +24,5 @@ urlpatterns = [
     path("", include("codexio_main.urls")), #http://localhost:8000/
     path('courses/', include('courses.urls')),
     path('payments/', include('payments.urls')),
+    path("users/", include("users.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

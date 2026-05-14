@@ -6,12 +6,22 @@ from django.utils.text import slugify
 from users.models import User
 
 class Course(models.Model):
+    COURSE_TYPE = (
+        ("recorded", "Recorded"),
+        ("live", "Live"),
+    )
 
     title = models.CharField(max_length=200)
 
     description = models.TextField()
 
     price = models.DecimalField(max_digits=8, decimal_places=2)
+
+    course_type = models.CharField(
+        max_length=10,
+        choices=COURSE_TYPE,
+        default="recorded"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -56,3 +66,23 @@ class Progress(models.Model):
 
     class Meta:
         unique_together = ['user', 'module']
+
+class ClassSession(models.Model):
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    date = models.DateTimeField()
+
+    def __str__(self):
+        return f"{self.course.title} - {self.title}"
+
+class Attendance(models.Model):
+
+    session = models.ForeignKey(ClassSession, on_delete=models.CASCADE)
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    attended = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ['session', 'student']
+

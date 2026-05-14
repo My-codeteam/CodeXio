@@ -3,42 +3,78 @@ from django.shortcuts import render, redirect
 # Create your views here.
 from django.contrib.auth import authenticate, login
 from .models import User
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
-def login_view(request):
-
-    if request.method == "POST":
-
-        username = request.POST['username']
-        password = request.POST['password']
-
-        user = authenticate(request,username=username,password=password)
-
-        if user:
-            login(request,user)
-            return redirect("dashboard")
-
-    return render(request,"auth/login.html")
-
-
-
-def signup(request):
+def signup_login_view(request):
 
     if request.method == "POST":
 
-        username = request.POST['username']
-        email = request.POST['email']
-        phone = request.POST['phone']
-        country = request.POST['country']
-        password = request.POST['password']
+        # LOGIN
+        if "login_submit" in request.POST:
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            phone=phone,
-            country=country,
-            password=password
-        )
+            username = request.POST.get("username")
+            password = request.POST.get("password")
 
-        return redirect("login")
+            user = authenticate(request, username=username, password=password)
 
-    return render(request,"auth/signup.html")
+            if user is not None:
+                login(request, user)
+                return redirect("student_portal")
+            else:
+                messages.error(request, "Invalid username or password")
+
+
+        # REGISTER
+        if "signup_submit" in request.POST:
+
+            username = request.POST.get("username")
+            email = request.POST.get("email")
+            phone = request.POST.get("phone")
+            country = request.POST.get("country")
+            password = request.POST.get("password")
+
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                phone=phone,
+                country=country
+            )
+
+            login(request, user)
+
+            return redirect("student_portal")
+
+    return render(request, "codexio_main/signupform.html")
+
+@login_required
+def edit_profile(request):
+
+    user = request.user
+
+    if request.method == "POST":
+
+        user.username = request.POST.get("username")
+        user.phone = request.POST.get("phone")
+
+        if request.FILES.get("profile_image"):
+            user.profile_image = request.FILES.get("profile_image")
+
+        user.save()
+
+        return redirect("student_portal")
+
+    return render(request,"users/edit_profile.html")
+
+@login_required
+def delete_account(request):
+
+    if request.method == "POST":
+
+        user = request.user
+        user.delete()
+
+        return redirect("home")
+
+    return render(request,"users/delete_confirm.html")

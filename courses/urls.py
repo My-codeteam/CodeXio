@@ -16,4 +16,15 @@ urlpatterns = [
 
     path("enroll/<int:course_id>/", views.enroll_course, name="enroll_course"),
 
+    path(
+    "submit-assignment/<int:assignment_id>/",
+    views.submit_assignment,
+    name="submit_assignment"),
+
+    path(
+    "module/<int:module_id>/complete/",
+    views.complete_module,
+    name="complete_module"
+)
+
 ]

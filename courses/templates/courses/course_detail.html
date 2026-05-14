@@ -40,7 +40,6 @@ border-radius:6px;
 
 <p>{{course.description}}</p>
 
-{% if course.price == 0 or enrolled %}
 
 <h3>Modules</h3>
 
@@ -56,17 +55,61 @@ border-radius:6px;
 
 {% endfor %}
 
+{% if course.is_live and enrolled %}
+
+<h3>Assignments</h3>
+
+
+{% for assignment in assignments %}
+
+<div class="module-card">
+
+<strong>{{assignment.title}}</strong>
+
+{% with submission=None %}
+
+{% for sub in submissions %}
+{% if sub.assignment.id == assignment.id %}
+{% with submission=sub %}
+{% endwith %}
+{% endif %}
+{% endfor %}
+
+{% if submission %}
+
+<p>Status: Submitted</p>
+
+<p>
+<a href="{{submission.link}}" target="_blank">
+View Submission
+</a>
+</p>
+
+{% if submission.grade %}
+<p>Grade: {{submission.grade}}</p>
+<p>Feedback: {{submission.feedback}}</p>
 {% else %}
+<p>Awaiting Review</p>
+{% endif %}
 
-<h3>Course Price: ₦{{course.price}}</h3>
-
-<form method="POST" action="{% url 'payments:initiate_payment' course.id %}">
-{% csrf_token %}
-<input type="hidden" name="course_id" value="{{course.id}}">
-<button class="enroll-btn">Enroll Now</button>
-</form>
+{% else %}
+ Not Attempted
 
 {% endif %}
+
+{% endwith %}
+
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+<h3>Progress</h3>
+
+<p>
+{{progress|length}} / {{modules|length}} Modules Completed
+</p>
 
 </div>
 

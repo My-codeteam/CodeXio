@@ -3,47 +3,38 @@ import os
 import requests
 from courses.models import Course, Enrollment
 from django.shortcuts import get_object_or_404
-from .flutterwave import initialize_payment
+from .lemonsqueezy import create_checkout
+from .forms import PaymentProofForm
 
 def initiate_payment(request, course_id):
 
     course = get_object_or_404(Course, id=course_id)
 
-    amount = course.price
-    email = request.user.email
+    if request.method == "POST":
 
-    if course.price == 0:
+        form = PaymentProofForm(request.POST, request.FILES)
 
-        Enrollment.objects.create(
-            user=request.user,
-            course=course,
-            paid=True
-        )
+        if form.is_valid():
 
-        return redirect("course_modules",id=course.id)
+            payment = form.save(commit=False)
 
+            payment.user = request.user
+            payment.course = course
+            payment.amount = course.price
 
-    payload = {
-        "tx_ref": f"course_{course.id}_user_{request.user.id}",
-        "amount": str(amount),
-        "currency": "NGN",
-        "redirect_url": "http://127.0.0.1:8000/payment/verify/",
-        "customer": {
-            "email": email
-        }
-    }
+            payment.save()
 
+            return render(request, "payments/payment_submitted.html")
 
-    res = initialize_payment(payload)
+    else:
+        form = PaymentProofForm()
 
-        # safety check
-    if res.get("status") != "success":
-        return render(request, "payments/payment_error.html", {
-                "error": res
-        })
+    return render(request, "payments/manual_payment.html", {
+        "course": course,
+        "form": form
+    })
 
-    return redirect(res["data"]["link"])
-
+"""
 def verify_payment(request):
 
     status = request.GET.get("status")
@@ -77,3 +68,4 @@ def verify_payment(request):
     })
 
 # Create your views here.
+"""

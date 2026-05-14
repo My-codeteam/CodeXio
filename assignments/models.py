@@ -29,3 +29,6 @@ class Submission(models.Model):
     feedback = models.TextField(blank=True)
 
     submitted_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['assignment', 'student']

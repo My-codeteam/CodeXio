@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from users.models import User
-from courses.models import Course
+from courses.models import Course, Enrollment
 
 class Payment(models.Model):
 
@@ -11,12 +11,25 @@ class Payment(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
+    receipt = models.ImageField(upload_to="payment_receipts/", null=True, blank=True)
 
-    reference = models.CharField(max_length=200)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
 
-    tx_ref = models.CharField(max_length=100, blank=True)
+    verified = models.BooleanField(default=False)
 
-    status = models.CharField(max_length=20, default="pending")
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    created = models.DateTimeField(auto_now_add=True)
+    def save(self, *args, **kwargs):
+
+      super().save(*args, **kwargs)
+
+      if self.verified and not Enrollment.objects.filter(user=self.user, course=self.course).exists():
+
+        Enrollment.objects.create(
+            user=self.user,
+            course=self.course,
+            paid=True
+        )
+
+class Meta:
+    unique_together = ["user", "course"]

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} Edit Profile {% endblock %}
+
+{% block content %}
+
+<h2>Edit Profile</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+{% csrf_token %}
+
+<label>Username</label>
+<input type="text" name="username" value="{{ user.username }}">
+
+<label>Phone</label>
+<input type="text" name="phone" value="{{ user.phone }}">
+
+<label>Profile Image</label>
+<input type="file" name="profile_image">
+
+<button type="submit">Update Profile</button>
+
+</form>
+
+{% endblock %}

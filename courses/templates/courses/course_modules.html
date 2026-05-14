@@ -35,7 +35,7 @@ margin-top:10px;
 <p>{{module.content}}</p>
 
 
-{% if assignment %}
+{% if course.is_live %}
 
 <div class="assignment">
 
@@ -43,20 +43,24 @@ margin-top:10px;
 
 <p>{{assignment.description}}</p>
 
-<form method="POST" enctype="multipart/form-data">
+<form method="POST" action="{% url 'submit_assignment' assignment.id %}">
 {% csrf_token %}
 
-<input type="file" name="submission">
-
-<button class="submit-btn">
-Submit Assignment
-</button>
-
-</form>
+<input
+type="url"
+name="link"
+placeholder="Paste GitHub / Live URL"
+required
+>
 
 </div>
 
 {% endif %}
+
+<form method="POST" action="{% url 'complete_module' module.id %}">
+{% csrf_token %}
+<button>Mark as Completed</button>
+</form>
 
 </div>
 

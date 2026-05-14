@@ -279,6 +279,60 @@ font-size:14px;
 
 }
 
+.profile-wrapper{
+position:relative;
+cursor:pointer;
+}
+
+.avatar{
+width:40px;
+height:40px;
+border-radius:50%;
+object-fit:cover;
+}
+
+.avatar-lg{
+width:70px;
+height:70px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:10px;
+}
+
+.profile-dropdown{
+position:absolute;
+right:0;
+top:55px;
+background:#111826;
+width:220px;
+border-radius:10px;
+border:1px solid #333;
+display:none;
+flex-direction:column;
+z-index:2000;
+}
+
+.profile-dropdown a{
+padding:12px 15px;
+text-decoration:none;
+color:#ddd;
+display:block;
+}
+
+.profile-dropdown a:hover{
+background:#1b2430;
+}
+
+.profile-header{
+text-align:center;
+padding:15px;
+border-bottom:1px solid #333;
+}
+
+.danger{
+color:#ff4d4d;
+}
+
 </style>
 
 
@@ -291,11 +345,11 @@ font-size:14px;
 
 <a href="/student_portal">Dashboard</a>
 <a href="{% url 'course_list' %}">Courses</a>
-<a href="#">Assignments</a>
+<a href="#">Live Cohorts</a>
+<a href="#">Editor</a>
 <a href="#">Ebooks</a>
 <a href="#">Community</a>
 <a href="#">Certificates</a>
-<a href="#">Settings</a>
 
 </div>
 
@@ -313,8 +367,46 @@ font-size:14px;
 
 <h1>Dashboard</h1>
 
-<div class="profile">
-M
+<div class="profile-wrapper">
+
+<div class="profile" onclick="toggleProfile()">
+
+{% if request.user.profile_image %}
+<img src="{{ request.user.profile_image.url }}" class="avatar">
+{% else %}
+{{ request.user.username|first|upper }}
+{% endif %}
+
+</div>
+
+<div class="profile-dropdown" id="profileDropdown">
+
+<div class="profile-header">
+
+{% if request.user.profile_image %}
+<img src="{{ request.user.profile_image.url }}" class="avatar-lg">
+{% endif %}
+
+<p>{{ request.user.username }}</p>
+<small>{{ request.user.student_id }}</small>
+
+</div>
+
+<a href="{% url 'users:edit_profile' %}">
+<i class="fa-solid fa-user"></i> Edit Profile
+</a>
+
+<a href="{% url 'users:delete_account' %}" class="danger">
+<i class="fa-solid fa-trash"></i> Delete Account
+</a>
+
+<form action="{% url 'users:logout' %}" method="POST">
+{% csrf_token %}
+<i class="fa-solid fa-right-from-bracket"><button type="submit">Logout</button></i>
+</form>
+
+</div>
+
 </div>
 
 </div>
@@ -524,6 +616,14 @@ botReply="I can help with courses, assignments, ebooks, certificates, and commun
 chat.innerHTML += "<br><b>Nexora:</b> "+botReply+"<br>"
 
 input.value=""
+
+}
+
+function toggleProfile(){
+
+let menu = document.getElementById("profileDropdown")
+
+menu.style.display = menu.style.display === "block" ? "none" : "block"
 
 }
 
