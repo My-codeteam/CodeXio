@@ -18,8 +18,17 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
 
         if not self.student_id:
+
             year = now().year
-            count = User.objects.count() + 1
-            self.student_id = f"CM-{year}-{count:04d}"
+
+            last_user = User.objects.order_by('-id').first()
+
+            if last_user and last_user.student_id:
+                last_number = int(last_user.student_id.split("-")[-1])
+                new_number = last_number + 1
+            else:
+                new_number = 1
+
+            self.student_id = f"CM-{year}-{new_number:04d}"
 
         super().save(*args, **kwargs)

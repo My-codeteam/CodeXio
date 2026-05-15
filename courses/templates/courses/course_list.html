@@ -1,7 +1,58 @@
 {% extends "base.html" %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
 {% block content %}
 
 <style>
+.sidebar a.active{
+background:#1b2430;
+color:white;
+border-left:4px solid #ff3b3b;
+}
+
+.menu-btn{
+display:none;
+font-size:24px;
+cursor:pointer;
+color: #0f141b;
+}
+
+.sidebar{
+width:230px;
+height:100vh;
+position:fixed;
+background:#0f141b;
+padding-top:30px;
+left:0;
+transition:0.3s;
+}
+
+.sidebar h2{
+text-align:center;
+color:#ff3b3b;
+margin-bottom:40px;
+}
+
+.sidebar a{
+display:block;
+padding:15px 25px;
+color:#bbb;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#1b2430;
+color:white;
+}
+
+.main{
+margin-left:230px;
+padding:30px 40px;
+transition:0.3s;
+}
 
 .container{
 max-width:1200px;
@@ -66,10 +117,50 @@ font-weight:bold;
 margin-top:10px;
 }
 
+@media (max-width:900px){
+
+.sidebar{
+left:-230px;
+}
+
+.sidebar.active{
+left:0;
+width:100%;
+height:100%;
+z-index:999;
+}
+
+.main{
+margin-left:0;
+padding:20px;
+}
+
+.menu-btn{
+display:block;
+z-index:3000;
+}
+
+}
 </style>
-
-
 <div class="container">
+<div class="menu-btn" onclick="toggleMenu()">
+<i class="fa-solid fa-bars"></i>
+</div>
+
+<div class="sidebar" id="sidebar">
+
+<h2>CodexMingle</h2>
+
+<a href="/student_portal" class="{% if request.resolver_match.url_name == 'student_portal' %}active{% endif %}">Dashboard</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">Courses</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Live Cohorts</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Editor</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Ebooks</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Community</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Certificates</a>
+
+</div>
+
 
 <h1>All Courses</h1>
 
@@ -118,5 +209,12 @@ margin-top:10px;
 </div>
 
 </div>
+
+<script>
+    function toggleMenu(){
+      let sidebar=document.getElementById("sidebar")
+      sidebar.classList.toggle("active")
+    }
+</script>
 
 {% endblock %}

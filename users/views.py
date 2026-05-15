@@ -63,7 +63,7 @@ def edit_profile(request):
 
         user.save()
 
-        return redirect("student_portal")
+        return redirect("/student_portal")
 
     return render(request,"users/edit_profile.html")
 

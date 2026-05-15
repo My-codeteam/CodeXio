@@ -333,6 +333,12 @@ border-bottom:1px solid #333;
 color:#ff4d4d;
 }
 
+.sidebar a.active{
+background:#1b2430;
+color:white;
+border-left:4px solid #ff3b3b;
+}
+
 </style>
 
 
@@ -343,13 +349,14 @@ color:#ff4d4d;
 
 <h2>CodexMingle</h2>
 
-<a href="/student_portal">Dashboard</a>
-<a href="{% url 'course_list' %}">Courses</a>
-<a href="#">Live Cohorts</a>
-<a href="#">Editor</a>
-<a href="#">Ebooks</a>
-<a href="#">Community</a>
-<a href="#">Certificates</a>
+<a href="student_portal" class="{% if request.resolver_match.url_name == 'student_portal' %}active{% endif %}">Dashboard</a>
+<a href="{% url 'course_list' %}" class="{% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">Courses</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Live Cohorts</a>
+<a href="/enrolled_courses" class="{% if request.resolver_match.url_name == 'enrolled'%}active{% endif %}">Enrolled</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Editor</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Ebooks</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Community</a>
+<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Certificates</a>
 
 </div>
 

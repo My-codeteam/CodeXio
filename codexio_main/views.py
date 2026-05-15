@@ -9,12 +9,13 @@ from django.db.models.functions import Now
 from datetime import timedelta
 import requests
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 from courses.models import Course, Enrollment
 from django.contrib.auth import authenticate, login
-
+from django.contrib import messages
 
 
 # Download the nltk data if not already downloaded
@@ -178,7 +179,7 @@ def student_portal(request):
 
     courses = Course.objects.order_by('-id')[:6]
 
-    updates = Update.objects.all()
+    updates = UpdateNotification.objects.all()
 
     # GitHub repos
     url = "https://api.github.com/orgs/CodexMingle/repos"
@@ -210,23 +211,51 @@ def student_portal(request):
 
 def signup(request):
 
-    if request.method == "POST" and "signup_submit" in request.POST:
+    if request.method == "POST":
 
-        username = request.POST['username']
-        email = request.POST['email']
-        phone = request.POST['phone']
-        country = request.POST['country']
-        password = request.POST['password']
+        # LOGIN
+        if "login_submit" in request.POST:
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            phone=phone,
-            country=country,
-            password=password
-        )
+            username = request.POST.get("username")
+            password = request.POST.get("password")
 
-        user.save()
+            user = authenticate(request, username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+                return redirect("/student_portal")
+
+                if user.is_superuser or user.is_staff:
+                    return redirect("admin_dashboard")
+
+            else:
+                messages.error(request, "Invalid username or password")
+
+
+        # REGISTER
+        if "signup_submit" in request.POST:
+
+            username = request.POST.get("username")
+            email = request.POST.get("email")
+            phone = request.POST.get("phone")
+            country = request.POST.get("country")
+            password = request.POST.get("password")
+
+            if User.objects.filter(username=username).exists():
+                messages.error(request,"Username already exists")
+                return redirect("login_submit")
+
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                phone=phone,
+                country=country
+            )
+
+            login(request, user)
+
+            return redirect("/student_portal")
 
     return render(request, "codexio_main/signupform.html")
 
@@ -246,4 +275,103 @@ def login_view(request):
 
     return render(request, "codexio_main/signupform.html")
 
+def enrolled_courses(request):
 
+    enrollments = Enrollment.objects.filter(student=request.user)
+
+    return render(request, "student/enrolled_courses.html", {
+        "enrollments": enrollments
+    })
+
+@staff_member_required
+def admin_dashboard(request):
+
+    courses = Course.objects.all()
+    users = User.objects.all()
+
+    return render(request, "dashboard/admin_panel/admin.html", {
+        "courses": courses,
+        "users": users
+    })
+
+@staff_member_required
+def create_course(request):
+
+    if request.method == "POST":
+
+        topic = request.POST.get("topic")
+        description = request.POST.get("description")
+        course_type = request.POST.get("course_type")
+        payment_type = request.POST.get("payment_type")
+
+        Course.objects.create(
+            title=topic,
+            description=description,
+            course_type=course_type,
+            payment_type=payment_type
+        )
+
+    return redirect('admin_dashboard')
+
+@staff_member_required
+def enroll_user(request):
+
+    if request.method == "POST":
+
+        user_id = request.POST.get("user_id")
+        course_id = request.POST.get("course_id")
+
+        user = User.objects.get(id=user_id)
+        course = Course.objects.get(id=course_id)
+
+        Enrollment.objects.create(
+            student=user,
+            course=course
+        )
+
+    return redirect('admin_dashboard')
+
+@staff_member_required
+def send_update(request):
+
+    if request.method == "POST":
+
+        message = request.POST.get("message")
+        user_id = request.POST.get("user")
+
+        if user_id == "all":
+
+            UpdateNotification.objects.create(
+                message=message
+            )
+
+        else:
+
+            user = User.objects.get(id=user_id)
+
+            UpdateNotification.objects.create(
+                user=user,
+                message=message
+            )
+
+    return redirect('admin_dashboard')
+
+@staff_member_required
+def remove_user(request, user_id):
+
+    user = User.objects.get(id=user_id)
+    user.delete()
+
+    return redirect('admin_dashboard')
+
+def admin_search(request):
+
+    query = request.GET.get("q")
+
+    users = User.objects.filter(username__icontains=query)
+    courses = Course.objects.filter(topic__icontains=query)
+
+    return render(request, "admin_panel/search.html", {
+        "users": users,
+        "courses": courses
+    })

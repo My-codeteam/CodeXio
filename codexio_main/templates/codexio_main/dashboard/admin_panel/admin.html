@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="admin-container">
+
+<h2>Admin Dashboard</h2>
+
+<form method="GET" action="{% url 'admin_search' %}">
+
+<input type="text" name="q" placeholder="Search users or courses">
+
+<button>Search</button>
+
+</form>
+<!-- Create Course -->
+
+<h3>Create Course</h3>
+
+<form method="POST" action="{% url 'create_course' %}">
+
+{% csrf_token %}
+
+<input type="text" name="topic" placeholder="Course Topic" required>
+
+<textarea name="description" placeholder="Course Description"></textarea>
+
+<select name="course_type">
+
+<option value="live">Live Cohort</option>
+<option value="recorded">Recorded Course</option>
+
+</select>
+
+<select name="payment_type">
+
+<option value="free">Free</option>
+<option value="paid">Paid</option>
+
+</select>
+
+<button>Create Course</button>
+
+</form>
+
+<hr>
+
+<!-- Courses -->
+
+<h3>All Courses</h3>
+
+{% for course in courses %}
+
+<div class="course-admin">
+
+<strong>{{ course.topic }}</strong>
+<span>{{ course.course_type }}</span>
+<span>{{ course.payment_type }}</span>
+
+</div>
+
+{% endfor %}
+
+<hr>
+
+<!-- Send Update -->
+
+<h3>Send Update</h3>
+
+<form method="POST" action="{% url 'send_update' %}">
+
+{% csrf_token %}
+
+<textarea name="message" placeholder="Update message"></textarea>
+
+<select name="user">
+
+<option value="all">All Users</option>
+
+{% for user in users %}
+
+<option value="{{ user.id }}">{{ user.username }}</option>
+
+{% endfor %}
+
+</select>
+
+<button>Send Update</button>
+
+</form>
+
+<hr>
+
+<!-- Enroll User -->
+
+<h3>Enroll User</h3>
+
+<form method="POST" action="{% url 'enroll_user' %}">
+
+{% csrf_token %}
+
+<select name="user_id">
+
+{% for user in users %}
+
+<option value="{{ user.id }}">{{ user.username }}</option>
+
+{% endfor %}
+
+</select>
+
+<select name="course_id">
+
+{% for course in courses %}
+
+<option value="{{ course.id }}">{{ course.topic }}</option>
+
+{% endfor %}
+
+</select>
+
+<button>Enroll</button>
+
+</form>
+
+<hr>
+
+<!-- Remove User -->
+
+<h3>Users</h3>
+
+{% for user in users %}
+
+<div class="user-row">
+
+{{ user.username }}
+
+<a href="{% url 'remove_user' user.id %}" class="delete-btn">Remove</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}
