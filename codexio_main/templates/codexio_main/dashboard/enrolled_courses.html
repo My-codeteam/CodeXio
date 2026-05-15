@@ -52,7 +52,7 @@ color:#4da3ff;
 
 <a href="{% url 'course_detail' enrollment.course.id %}" class="course-card">
 
-<h3>{{ enrollment.course.topic }}</h3>
+<h3>{{ enrollment.course.title }}</h3>
 
 <p>{{ enrollment.course.description|truncatewords:20 }}</p>
 

@@ -6,18 +6,16 @@
 
 <h2>Admin Dashboard</h2>
 
-<form method="GET" action="{% url 'admin_search' %}">
-
-<input type="text" name="q" placeholder="Search users or courses">
-
-<button>Search</button>
-
+<form method="GET">
+    <input type="text" name="q" placeholder="Search users or courses">
+    <button type="submit">Search</button>
 </form>
+
 <!-- Create Course -->
 
 <h3>Create Course</h3>
 
-<form method="POST" action="{% url 'create_course' %}">
+<form method="POST" action="{% url 'courses:create_course' %}">
 
 {% csrf_token %}
 
@@ -67,7 +65,7 @@
 
 <h3>Send Update</h3>
 
-<form method="POST" action="{% url 'send_update' %}">
+<form method="POST" action="{% url 'courses:send_update' %}">
 
 {% csrf_token %}
 
@@ -95,7 +93,7 @@
 
 <h3>Enroll User</h3>
 
-<form method="POST" action="{% url 'enroll_user' %}">
+<form method="POST" action="{% url 'courses:enroll_user' %}">
 
 {% csrf_token %}
 
@@ -135,7 +133,7 @@
 
 {{ user.username }}
 
-<a href="{% url 'remove_user' user.id %}" class="delete-btn">Remove</a>
+<a href="{% url 'courses:remove_user' user.id %}" class="delete-btn">Remove</a>
 
 </div>
 

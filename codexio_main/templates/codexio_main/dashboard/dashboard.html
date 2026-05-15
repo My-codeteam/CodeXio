@@ -352,7 +352,7 @@ border-left:4px solid #ff3b3b;
 <a href="student_portal" class="{% if request.resolver_match.url_name == 'student_portal' %}active{% endif %}">Dashboard</a>
 <a href="{% url 'course_list' %}" class="{% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">Courses</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Live Cohorts</a>
-<a href="/enrolled_courses" class="{% if request.resolver_match.url_name == 'enrolled'%}active{% endif %}">Enrolled</a>
+<a href="{% url 'courses:enrolled_courses' %}" class="{% if request.resolver_match.url_name == 'enrolled_courses'%}active{% endif %}">Enrolled</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Editor</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Ebooks</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Community</a>

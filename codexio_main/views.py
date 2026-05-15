@@ -13,7 +13,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-from courses.models import Course, Enrollment
+from courses.models import Course, Enrollment, UpdateNotification
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 
@@ -221,12 +221,12 @@ def signup(request):
 
             user = authenticate(request, username=username, password=password)
 
-            if user is not None:
+            if user.is_superuser or user.is_staff:
+                login(request, user)
+                return redirect("courses:admin_dashboard")
+            elif user is not None:
                 login(request, user)
                 return redirect("/student_portal")
-
-                if user.is_superuser or user.is_staff:
-                    return redirect("admin_dashboard")
 
             else:
                 messages.error(request, "Invalid username or password")
@@ -277,22 +277,31 @@ def login_view(request):
 
 def enrolled_courses(request):
 
-    enrollments = Enrollment.objects.filter(student=request.user)
+    enrollments = Enrollment.objects.filter(user=request.user)
 
-    return render(request, "student/enrolled_courses.html", {
+    return render(request, "codexio_main/dashboard/enrolled_courses.html", {
         "enrollments": enrollments
     })
 
 @staff_member_required
 def admin_dashboard(request):
 
-    courses = Course.objects.all()
-    users = User.objects.all()
+    query = request.GET.get("q")
 
-    return render(request, "dashboard/admin_panel/admin.html", {
+    users = User.objects.all()
+    courses = Course.objects.all()
+
+    if query:
+        users = User.objects.filter(username__icontains=query)
+        courses = Course.objects.filter(topic__icontains=query)
+
+    context = {
+        "users": users,
         "courses": courses,
-        "users": users
-    })
+        "query": query
+    }
+
+    return render(request, "codexio_main/dashboard/admin_panel/admin.html", context)
 
 @staff_member_required
 def create_course(request):
@@ -311,7 +320,7 @@ def create_course(request):
             payment_type=payment_type
         )
 
-    return redirect('admin_dashboard')
+    return redirect('courses:admin_dashboard')
 
 @staff_member_required
 def enroll_user(request):
@@ -329,7 +338,7 @@ def enroll_user(request):
             course=course
         )
 
-    return redirect('admin_dashboard')
+    return redirect('courses:admin_dashboard')
 
 @staff_member_required
 def send_update(request):
@@ -354,7 +363,7 @@ def send_update(request):
                 message=message
             )
 
-    return redirect('admin_dashboard')
+    return redirect('courses:admin_dashboard')
 
 @staff_member_required
 def remove_user(request, user_id):
@@ -362,16 +371,4 @@ def remove_user(request, user_id):
     user = User.objects.get(id=user_id)
     user.delete()
 
-    return redirect('admin_dashboard')
-
-def admin_search(request):
-
-    query = request.GET.get("q")
-
-    users = User.objects.filter(username__icontains=query)
-    courses = Course.objects.filter(topic__icontains=query)
-
-    return render(request, "admin_panel/search.html", {
-        "users": users,
-        "courses": courses
-    })
+    return redirect('courses:admin_dashboard')
