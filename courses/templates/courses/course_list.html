@@ -141,24 +141,35 @@ z-index:3000;
 }
 
 }
+.sidebar{
+transition: left 0.35s ease;
+}
 </style>
-<div class="container">
-<div class="menu-btn" onclick="toggleMenu()">
-<i class="fa-solid fa-bars"></i>
-</div>
-
 <div class="sidebar" id="sidebar">
 
 <h2>CodexMingle</h2>
 
-<a href="/student_portal" class="{% if request.resolver_match.url_name == 'student_portal' %}active{% endif %}">Dashboard</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">Courses</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Live Cohorts</a>
+<a href="{% url 'courses:student_portal' %}" class="{% if request.resolver_match.url_name == 'student_portal' %}active{% endif %}">Dashboard</a>
+<a href="{% url 'course_list' %}" class="{% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">Courses</a>
+<a href="{% url 'courses:live_courses' %}" class="{% if request.resolver_match.url_name == 'live_courses' %}active{% endif %}">Live Cohorts</a>
+<a href="{% url 'courses:enrolled_courses' %}" class="{% if request.resolver_match.url_name == 'enrolled_courses'%}active{% endif %}">Enrolled</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Editor</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Ebooks</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Community</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Certificates</a>
 
+</div>
+
+
+
+<!-- MAIN CONTENT -->
+
+<div class="main">
+
+<div class="header">
+
+<div class="menu-btn" onclick="toggleMenu()">
+<i class="fa-solid fa-bars"></i>
 </div>
 
 
