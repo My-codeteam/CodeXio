@@ -2,70 +2,199 @@
 
 {% block content %}
 
+<style>
+    .admin-container{
+max-width:1200px;
+margin:auto;
+padding:20px;
+}
+
+.admin-title{
+margin-bottom:20px;
+}
+
+.admin-card{
+background:#fff;
+padding:20px;
+border-radius:8px;
+margin-bottom:25px;
+box-shadow:0 2px 8px rgba(0,0,0,0.05);
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-form select{
+width:100%;
+padding:10px;
+margin:10px 0;
+border-radius:5px;
+border:1px solid #ccc;
+}
+
+.admin-form button{
+background:#0b5cff;
+color:white;
+padding:10px 20px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.course-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.course-admin{
+background:#f9f9f9;
+padding:15px;
+border-radius:6px;
+}
+
+.course-meta{
+display:flex;
+justify-content:space-between;
+font-size:14px;
+margin-top:10px;
+}
+
+.mini-form{
+margin-top:10px;
+display:flex;
+gap:5px;
+}
+
+.mini-form input{
+flex:1;
+padding:8px;
+}
+
+.user-list{
+margin-top:15px;
+}
+
+.user-row{
+display:flex;
+justify-content:space-between;
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+.delete-btn{
+color:white;
+background:red;
+padding:5px 10px;
+border-radius:4px;
+text-decoration:none;
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.admin-form button{
+width:100%;
+}
+
+.user-row{
+flex-direction:column;
+gap:5px;
+}
+
+}
+</style>
+
 <div class="admin-container">
 
-<h2>Admin Dashboard</h2>
+<h2 class="admin-title">Admin Dashboard</h2>
 
-<form method="GET">
+<!-- Search -->
+<form method="GET" class="search-form">
     <input type="text" name="q" placeholder="Search users or courses">
     <button type="submit">Search</button>
 </form>
 
 <!-- Create Course -->
+<div class="admin-card">
 
 <h3>Create Course</h3>
 
-<form method="POST" action="{% url 'courses:create_course' %}">
+<form method="POST" action="{% url 'courses:create_course' %}" class="admin-form">
 
 {% csrf_token %}
 
 <input type="text" name="topic" placeholder="Course Topic" required>
 
 <textarea name="description" placeholder="Course Description"></textarea>
-
+<input type="number" name="price" placeholder="Course Price">
 <select name="course_type">
-
 <option value="live">Live Cohort</option>
 <option value="recorded">Recorded Course</option>
-
 </select>
 
 <select name="payment_type">
-
 <option value="free">Free</option>
 <option value="paid">Paid</option>
-
 </select>
 
 <button>Create Course</button>
 
 </form>
 
-<hr>
+</div>
 
 <!-- Courses -->
+<div class="admin-card">
 
 <h3>All Courses</h3>
+
+<div class="course-grid">
 
 {% for course in courses %}
 
 <div class="course-admin">
 
-<strong>{{ course.topic }}</strong>
+<strong>{{ course.title }}</strong>
+
+<p>{{ course.description|truncatewords:10 }}</p>
+
+<div class="course-meta">
+
 <span>{{ course.course_type }}</span>
 <span>{{ course.payment_type }}</span>
 
 </div>
 
+<!-- MODULE CREATION -->
+
+<form method="POST" action="{% url 'courses:create_module' %}" class="mini-form">
+
+{% csrf_token %}
+
+<input type="hidden" name="course_id" value="{{ course.id }}">
+
+<input type="text" name="title" placeholder="Module Title">
+
+<button>Add Module</button>
+
+</form>
+
+</div>
+
 {% endfor %}
 
-<hr>
+</div>
+
+</div>
 
 <!-- Send Update -->
 
+<div class="admin-card">
+
 <h3>Send Update</h3>
 
-<form method="POST" action="{% url 'courses:send_update' %}">
+<form method="POST" action="{% url 'courses:send_update' %}" class="admin-form">
 
 {% csrf_token %}
 
@@ -87,22 +216,22 @@
 
 </form>
 
-<hr>
+</div>
 
 <!-- Enroll User -->
 
+<div class="admin-card">
+
 <h3>Enroll User</h3>
 
-<form method="POST" action="{% url 'courses:enroll_user' %}">
+<form method="POST" action="{% url 'courses:enroll_user' %}" class="admin-form">
 
 {% csrf_token %}
 
 <select name="user_id">
 
 {% for user in users %}
-
 <option value="{{ user.id }}">{{ user.username }}</option>
-
 {% endfor %}
 
 </select>
@@ -110,9 +239,7 @@
 <select name="course_id">
 
 {% for course in courses %}
-
-<option value="{{ course.id }}">{{ course.topic }}</option>
-
+<option value="{{ course.id }}">{{ course.title }}</option>
 {% endfor %}
 
 </select>
@@ -121,17 +248,21 @@
 
 </form>
 
-<hr>
+</div>
 
-<!-- Remove User -->
+<!-- Remove Users -->
+
+<div class="admin-card">
 
 <h3>Users</h3>
+
+<div class="user-list">
 
 {% for user in users %}
 
 <div class="user-row">
 
-{{ user.username }}
+<span>{{ user.username }}</span>
 
 <a href="{% url 'courses:remove_user' user.id %}" class="delete-btn">Remove</a>
 
@@ -140,5 +271,47 @@
 {% endfor %}
 
 </div>
+
+</div>
+
+<form method="POST" action="{% url 'courses:create_assignment' %}">
+
+{% csrf_token %}
+<label>Select Course</label>
+<select name="course_id" required>
+
+<option value="">Select Course</option>
+
+{% for course in courses %}
+<option value="{{ course.id }}">{{ course.title }}</option>
+{% endfor %}
+
+</select>
+
+
+<label>Select Module</label>
+
+<select name="module_id" required>
+    <option value="">Select Module</option>
+    {% for module in modules %}
+        <option value="{{ module.id }}">{{ module.course.title }} - {{ module.title }}</option>
+    {% endfor %}
+</select>
+
+
+<input type="text" name="title" placeholder="Assignment Title">
+
+<textarea name="instructions"></textarea>
+
+<button>Add Assignment</button>
+
+</form>
+
+</div>
+
+<form action="{% url 'users:logout' %}" method="POST">
+{% csrf_token %}
+<i class="fa-solid fa-right-from-bracket"><button type="submit">Logout</button></i>
+</form>
 
 {% endblock %}

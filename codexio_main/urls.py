@@ -16,4 +16,7 @@ urlpatterns = [
     path('enroll-user/', views.enroll_user, name='enroll_user'),
     path('send-update/', views.send_update, name='send_update'),
     path('remove-user/<int:user_id>/', views.remove_user, name='remove_user'),
+    path("create-module/", views.create_module, name="create_module"),
+    path("create-assignment/", views.create_assignment, name="create_assignment"),
+    path('live-cohorts/', views.live_courses, name='live_courses'),
 ]

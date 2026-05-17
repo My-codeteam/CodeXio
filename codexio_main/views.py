@@ -1,7 +1,7 @@
 import nltk
 
 from nltk.chat.util import Chat, reflections
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import *
 from users.models import User
@@ -13,10 +13,11 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-from courses.models import Course, Enrollment, UpdateNotification
+from courses.models import Course, Enrollment, UpdateNotification, Module
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
-
+from assignments.models import Assignment
+from django.utils import timezone
 
 # Download the nltk data if not already downloaded
 nltk.download('punkt')
@@ -291,13 +292,16 @@ def admin_dashboard(request):
     users = User.objects.all()
     courses = Course.objects.all()
 
+    modules = Module.objects.select_related('course').all()
+
     if query:
         users = User.objects.filter(username__icontains=query)
-        courses = Course.objects.filter(topic__icontains=query)
+        courses = Course.objects.filter(title__icontains=query)
 
     context = {
         "users": users,
         "courses": courses,
+        "modules": modules,
         "query": query
     }
 
@@ -312,18 +316,21 @@ def create_course(request):
         description = request.POST.get("description")
         course_type = request.POST.get("course_type")
         payment_type = request.POST.get("payment_type")
+        price = request.POST.get("price")
 
         Course.objects.create(
             title=topic,
             description=description,
             course_type=course_type,
-            payment_type=payment_type
+            payment_type=payment_type,
+            price=price
         )
 
     return redirect('courses:admin_dashboard')
 
 @staff_member_required
 def enroll_user(request):
+
 
     if request.method == "POST":
 
@@ -333,10 +340,16 @@ def enroll_user(request):
         user = User.objects.get(id=user_id)
         course = Course.objects.get(id=course_id)
 
-        Enrollment.objects.create(
-            student=user,
-            course=course
-        )
+        if Enrollment.objects.filter(user=user, course=course).exists():
+            messages.warning(request, "User already enrolled in this course.")
+
+        else:
+            Enrollment.objects.create(
+                user=user,
+                course=course
+            )
+
+            messages.success(request, "User successfully enrolled.")
 
     return redirect('courses:admin_dashboard')
 
@@ -372,3 +385,57 @@ def remove_user(request, user_id):
     user.delete()
 
     return redirect('courses:admin_dashboard')
+
+def create_module(request):
+
+    if request.method == "POST":
+
+        course_id = request.POST.get("course_id")
+        title = request.POST.get("title")
+
+        course = Course.objects.get(id=course_id)
+
+        last_module = Module.objects.filter(course=course).order_by("-order").first()
+
+        if last_module:
+            order = last_module.order + 1
+        else:
+            order = 1
+
+        Module.objects.create(
+            course=course,
+            title=title,
+            order=order
+        )
+
+    return redirect("courses:admin_dashboard")
+
+def create_assignment(request):
+
+    if request.method == "POST":
+
+        module_id = request.POST.get("module_id")
+        title = request.POST.get("title")
+        instructions = request.POST.get("instructions")
+
+        if not module_id:
+            return redirect("courses:admin_dashboard")
+
+        module = get_object_or_404(Module, id=module_id)
+
+        Assignment.objects.create(
+            module=module,
+            title=title,
+            description=instructions
+        )
+
+    return redirect("courses:admin_dashboard")
+
+def live_courses(request):
+
+    courses = Course.objects.filter(course_type="live")
+
+    return render(request, "codexio_main/live_courses.html", {
+        "courses": courses,
+        "now": timezone.now()
+    })

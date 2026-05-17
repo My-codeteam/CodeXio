@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+
+{% block title %}Live Cohorts{% endblock%}
+{% block content %}
+<style>
+
+body{
+font-family: Arial;
+background:#0f172a;
+color:white;
+margin:0;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:40px 20px;
+}
+
+.section{
+margin-bottom:50px;
+}
+
+.course-card{
+background:#111826;
+border:1px solid #1f2933;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+.enroll-btn{
+margin-top:15px;
+padding:10px 20px;
+background:#ff3b3b;
+border:none;
+border-radius:6px;
+color:white;
+cursor:pointer;
+}
+
+.disabled{
+background:#444;
+cursor:not-allowed;
+}
+
+</style>
+
+<div class="container">
+
+<h1>Live Cohorts</h1>
+
+<!-- UPCOMING COHORTS -->
+
+<div class="section">
+
+<h2>Upcoming Cohorts</h2>
+
+{% if upcoming_courses %}
+
+{% for course in upcoming_courses %}
+
+<div class="course-card">
+
+<h3>{{course.title}}</h3>
+
+<p>{{course.description}}</p>
+
+<p>
+Enrollment Opens: {{course.enrollment_open}}
+</p>
+
+<div id="countdown-{{course.id}}"></div>
+
+<button
+class="enroll-btn disabled"
+id="btn-{{course.id}}"
+onclick="location.href='{% url 'enroll_course' course.id %}'"
+>
+Enroll Now
+</button>
+
+</div>
+
+<script>
+
+var countDownDate = new Date("{{course.enrollment_open|date:'Y-m-d H:i:s'}}").getTime();
+
+var x = setInterval(function(){
+
+var now = new Date().getTime();
+
+var distance = countDownDate - now;
+
+var hours = Math.floor((distance % (1000*60*60*24))/(1000*60*60));
+var minutes = Math.floor((distance % (1000*60*60))/(1000*60));
+var seconds = Math.floor((distance % (1000*60))/1000);
+
+document.getElementById("countdown-{{course.id}}").innerHTML =
+hours+"h "+minutes+"m "+seconds+"s ";
+
+if(distance < 0){
+
+clearInterval(x);
+
+document.getElementById("countdown-{{course.id}}").innerHTML = "Enrollment Open";
+
+var btn = document.getElementById("btn-{{course.id}}");
+
+btn.classList.remove("disabled");
+
+}
+
+},1000);
+
+</script>
+
+{% endfor %}
+
+{% else %}
+
+<p>No upcoming live cohorts.</p>
+
+{% endif %}
+
+</div>
+
+---
+
+<!-- ENROLLED COHORTS -->
+
+<div class="section">
+
+<h2>Your Live Cohorts</h2>
+
+{% if enrolled_courses %}
+
+{% for course in enrolled_courses %}
+
+<div class="course-card">
+
+<h3>{{course.title}}</h3>
+
+<p>{{course.description}}</p>
+
+<a href="{% url 'course_detail' course.id %}">
+Go to Course
+</a>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<p>You are not enrolled in any live cohort.</p>
+
+{% endif %}
+
+</div>
+
+</div>
+
+
+{% endblock %}

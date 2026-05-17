@@ -32,6 +32,8 @@ class Course(models.Model):
         default="recorded"
     )
 
+    enrollment_open = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -44,6 +46,13 @@ class Module(models.Model):
     content = models.TextField()
 
     order = models.IntegerField()
+
+    class_url = models.URLField(blank=True, null=True)
+
+    class_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         ordering = ["order"]

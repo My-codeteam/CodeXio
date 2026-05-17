@@ -1,15 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Course, Module, Enrollment, Progress
+from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession
 from assignments.models import Assignment, Submission
 from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef
+from django.utils.timezone import now
 
 def course_list(request):
 
     search = request.GET.get("search")
     free = request.GET.get("free")
 
-    courses = Course.objects.all()
+    courses = Course.objects.filter(course_type="recorded")
 
     if request.user.is_authenticated:
         enrollments = Enrollment.objects.filter(
@@ -53,7 +54,13 @@ def course_detail(request, course_id):
     )
 
     # Attendance for live courses
-    sessions = course.classsession_set.all()
+
+    sessions = ClassSession.objects.filter(module__course=course)
+
+    attended_sessions = Attendance.objects.filter(
+        student=request.user,
+        attended=True
+    ).values_list('session_id', flat=True)
 
 
     enrolled_course = []
@@ -70,7 +77,9 @@ def course_detail(request, course_id):
         "progress": progress,
         "submissions": submissions,
         "assignments": assignments,
-        "sessions": sessions
+        "sessions": sessions,
+        'attended_sessions':attended_sessions,
+        'now':now()
     }
 
     return render(request, "courses/course_detail.html", context)
