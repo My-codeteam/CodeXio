@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Student Portal|Certificate
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+<div class="certificate">
+
+{% if certificate.certificate_template %}
+
+<img src="{{ certificate.certificate_template.url }}" width="800">
+
+<br><br>
+
+<a href="{% url 'download_certificate' certificate.certificate_id %}">
+<button>Download Certificate</button>
+</a>
+
+{% else %}
+
+<h1>Certificate of Completion</h1>
+
+<p>This certifies that</p>
+
+<h2>{{ certificate.student.get_full_name }}</h2>
+
+<p>has successfully completed the course</p>
+
+<h3>{{ certificate.course.title }}</h3>
+
+<p>Issued by CodexMingle</p>
+
+<p>Date: {{ certificate.issued_date|date:"F Y" }}</p>
+
+<p>
+Certificate ID: {{ certificate.certificate_id }}
+</p>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

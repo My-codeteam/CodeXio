@@ -349,22 +349,7 @@ transition: left 0.35s ease;
 
 <!-- SIDEBAR -->
 
-<div class="sidebar" id="sidebar">
-
-<h2>CodexMingle</h2>
-
-<a href="student_portal" class="{% if request.resolver_match.url_name == 'student_portal' %}active{% endif %}">Dashboard</a>
-<a href="{% url 'course_list' %}" class="{% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">Courses</a>
-<a href="live-cohorts" class="{% if request.resolver_match.url_name == 'live-cohorts' %}active{% endif %}">Live Cohorts</a>
-<a href="{% url 'courses:enrolled_courses' %}" class="{% if request.resolver_match.url_name == 'enrolled_courses'%}active{% endif %}">Enrolled</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Editor</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Ebooks</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Community</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Certificates</a>
-
-</div>
-
-
+{% include "components/sidebar.html" %}
 
 <!-- MAIN CONTENT -->
 
@@ -480,33 +465,35 @@ transition: left 0.35s ease;
 
 <table>
 
+<thead>
 <tr>
 <th>Student</th>
 <th>Courses Completed</th>
-<th>Projects</th>
+<th>Contributions</th>
 <th>Rank</th>
 </tr>
+</thead>
 
+<tbody>
+
+{% for user in contributors %}
 <tr>
-<td>John Doe</td>
+<td><img src="{{ user.avatar_url }}" width="35" style="border-radius:50%;">
+{{ user.login }}</td>
 <td>5</td>
-<td>3</td>
-<td>🥇</td>
+<td>{{ user.contributions }}</td>
+<td>{{ forloop.counter }}</td>
 </tr>
 
-<tr>
-<td>Sarah Kim</td>
-<td>4</td>
-<td>3</td>
-<td>🥈</td>
-</tr>
+{% empty %}
 
 <tr>
-<td>Ahmed Musa</td>
-<td>4</td>
-<td>2</td>
-<td>🥉</td>
+<td colspan="4">No contributors yet</td>
 </tr>
+
+{% endfor %}
+
+</tbody>
 
 </table>
 

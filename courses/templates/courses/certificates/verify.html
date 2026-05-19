@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Student Porta|Verify Cert
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+<h2>Certificate Verification</h2>
+
+<p><strong>Student:</strong> {{ certificate.student.get_full_name }}</p>
+
+<p><strong>Course:</strong> {{ certificate.course.title }}</p>
+
+<p><strong>Date Issued:</strong> {{ certificate.issued_date }}</p>
+
+<p><strong>Certificate ID:</strong> {{ certificate.certificate_id }}</p>
+
+<p style="color:green;">
+This certificate is valid and issued by CodexMingle.
+</p>
+
+{% endblock %}

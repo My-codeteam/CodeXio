@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Students projects
+{% endblock %}
+
+{% block content %}
+<h2>Student Projects</h2>
+
+{% for project in projects %}
+
+<div class="project-card">
+
+    <h3>{{ project.name }}</h3>
+
+    <p>{{ project.description }}</p>
+
+    <p>Language: {{ project.language }}</p>
+
+    <a href="{{ project.html_url }}" target="_blank">
+        View Project
+    </a>
+
+</div>
+
+{% endfor %}
+{% endblock %}

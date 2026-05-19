@@ -2,7 +2,10 @@ from django.db import models
 from django.utils.text import slugify
 from datetime import timedelta
 from django.utils.timezone import now
-
+from codexio_main.models import Update
+import uuid
+import random
+import string
 # Create your models here.
 
 from users.models import User
@@ -109,6 +112,7 @@ class Progress(models.Model):
 class ClassSession(models.Model):
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
     date = models.DateTimeField()
 
@@ -125,3 +129,81 @@ class Attendance(models.Model):
     class Meta:
         unique_together = ['session', 'student']
 
+def generate_certificate_code(course):
+    year = "2026"
+
+    # course abbreviation
+    title = course.title.lower()
+
+    if "backend" in title:
+        course_code = "BE"
+    elif "frontend" in title:
+        course_code = "FE"
+    elif "cloud" in title:
+        course_code = "CL"
+    else:
+        course_code = "CR"
+
+    random_hash = ''.join(random.choices(string.hexdigits.upper(), k=5))
+
+    return f"CM-{year}-{course_code}-{random_hash}"
+
+
+class Certificate(models.Model):
+
+    CERT_TYPE = (
+        ("completion", "Completion"),
+        ("participation", "Participation"),
+        ("achievement", "Achievement"),
+    )
+
+    student = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    certificate_type = models.CharField(
+        max_length=20,
+        choices=CERT_TYPE,
+        default="completion",
+    )
+
+    certificate_id = models.CharField(
+        max_length=50,
+        unique=True,
+        editable=False
+    )
+
+    issued_date = models.DateTimeField(auto_now_add=True)
+
+    certificate_template = models.ImageField(
+        upload_to="certificate_templates/",
+        blank=True,
+        null=True
+    )
+
+    def save(self, *args, **kwargs):
+
+        if not self.certificate_id:
+            self.certificate_id = generate_certificate_code(self.course)
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        unique_together = ['student', 'course', 'certificate_type']
+
+    def __str__(self):
+        return f"{self.student.username} - {self.course.title}"
+
+class CompletedCourse(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    completed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ["user", "course"]
+
+    def __str__(self):
+        return f"{self.user.username} completed {self.course.title}"

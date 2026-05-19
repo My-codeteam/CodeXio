@@ -170,6 +170,18 @@ def get_chatbot_response(user_message):
 
 @login_required
 def student_portal(request):
+    contributors = []
+
+    try:
+        url = "https://api.github.com/repos/codexmingleteam-sudo/student-projects/contributors"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            contributors = response.json()[:10]
+
+    except:
+        contributors = []
+
     total_courses = Course.objects.count()
 
     total_members = User.objects.count()
@@ -183,7 +195,7 @@ def student_portal(request):
     updates = UpdateNotification.objects.all()
 
     # GitHub repos
-    url = "https://api.github.com/orgs/CodexMingle/repos"
+    url = "https://api.github.com/users/codexmingleteam-sudo/repos"
 
     response = requests.get(url)
 
@@ -203,7 +215,9 @@ def student_portal(request):
 
         "updates": updates,
 
-        "courses": courses
+        "courses": courses,
+
+        "contributors": contributors
 
     }
 
@@ -431,11 +445,47 @@ def create_assignment(request):
 
     return redirect("courses:admin_dashboard")
 
+
 def live_courses(request):
 
-    courses = Course.objects.filter(course_type="live")
+    now = timezone.now()
 
-    return render(request, "codexio_main/live_courses.html", {
-        "courses": courses,
-        "now": timezone.now()
-    })
+    # upcoming cohorts (enrollment not yet open)
+    upcoming_courses = Course.objects.filter(
+        course_type="live",
+        enrollment_open__gt=now
+    )
+
+    # cohorts where enrollment is open
+    open_courses = Course.objects.filter(
+        course_type="live",
+        enrollment_open__lte=now
+    )
+
+    # courses the student enrolled in
+    enrolled_courses = Course.objects.filter(
+        enrollment__user=request.user,
+        course_type="live"
+    )
+
+    context = {
+        "upcoming_courses": upcoming_courses,
+        "open_courses": open_courses,
+        "enrolled_courses": enrolled_courses,
+        "now": now
+    }
+
+    return render(request, "codexio_main/live_courses.html", context)
+
+def project_showcase(request):
+
+    url = "https://api.github.com/users/codexmingleteam-sudo/repos"
+    response = requests.get(url)
+
+    projects = response.json()
+
+    context = {
+        "projects": projects
+    }
+
+    return render(request, "codexio_main/dashboard/projects.html", context)

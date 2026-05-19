@@ -1,9 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession
+from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession, Certificate
 from assignments.models import Assignment, Submission
 from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef
 from django.utils.timezone import now
+from .utils import generate_certificate
+import pdfkit
+from django.http import HttpResponse
 
 def course_list(request):
 
@@ -163,3 +166,55 @@ def submit_assignment(request, assignment_id):
         )
 
     return redirect("courses:course_detail", course_id=assignment.module.course.id)
+
+def certificate_view(request, course_id):
+
+    certificate = generate_certificate(request.user, course_id)
+
+    if not certificate:
+        return HttpResponse("Course not completed yet")
+
+    return render(
+        request,
+        "courses/certificates/certificate.html",
+        {"certificate": certificate}
+    )
+
+
+def download_certificate(request, certificate_id):
+
+    certificate = get_object_or_404(
+        Certificate,
+        certificate_id=certificate_id
+    )
+
+    html = render(
+        request,
+        "courses/certificates/certificate_pdf.html",
+        {"certificate": certificate}
+    ).content.decode("utf-8")
+
+    pdf = pdfkit.from_string(html, False)
+
+    response = HttpResponse(
+        pdf,
+        content_type="application/pdf"
+    )
+
+    response['Content-Disposition'] = f'attachment; filename="certificate.pdf"'
+
+    return response
+
+
+def verify_certificate(request, certificate_id):
+
+    certificate = get_object_or_404(
+        Certificate,
+        certificate_id=certificate_id
+    )
+
+    return render(
+        request,
+        "courses/certificates/verify.html",
+        {"certificate": certificate}
+    )

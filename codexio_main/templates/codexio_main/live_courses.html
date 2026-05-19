@@ -137,21 +137,7 @@ cursor:not-allowed;
 
 </style>
 
-<div class="sidebar" id="sidebar">
-
-<h2>CodexMingle</h2>
-
-<a href="student_portal" class="{% if request.resolver_match.url_name == 'student_portal' %}active{% endif %}">Dashboard</a>
-<a href="{% url 'course_list' %}" class="{% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">Courses</a>
-<a href="live-cohorts" class="{% if request.resolver_match.url_name == 'live-cohorts' %}active{% endif %}">Live Cohorts</a>
-<a href="{% url 'courses:enrolled_courses' %}" class="{% if request.resolver_match.url_name == 'enrolled_courses'%}active{% endif %}">Enrolled</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Editor</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Ebooks</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Community</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Certificates</a>
-
-</div>
-
+{% include "components/sidebar.html" %}
 
 
 <!-- MAIN CONTENT -->
@@ -164,7 +150,6 @@ cursor:not-allowed;
 <i class="fa-solid fa-bars"></i>
 </div>
 
-<div class="container">
 
 <h1>Live Cohorts</h1>
 
@@ -192,9 +177,7 @@ Enrollment Opens: {{course.enrollment_open}}
 
 <button
 class="enroll-btn disabled"
-id="btn-{{course.id}}"
-onclick="location.href='{% url 'enroll_course' course.id %}'"
->
+id="btn-{{course.id}}">
 Enroll Now
 </button>
 
@@ -202,7 +185,7 @@ Enroll Now
 
 <script>
 
-var countDownDate = new Date("{{course.enrollment_open|date:'Y-m-d H:i:s'}}").getTime();
+var countDownDate = new Date("{{course.enrollment_open|date:'c'}}").getTime();
 
 var x = setInterval(function(){
 
@@ -243,6 +226,23 @@ btn.classList.remove("disabled");
 
 </div>
 
+<h2>Enrollment Open</h2>
+
+{% for course in open_courses %}
+
+<div class="course-card">
+
+<h3>{{ course.title }}</h3>
+<p>{{ course.description }}</p>
+
+<a href="{% url 'enroll_course' course.id %}">
+<button class="enroll-btn">Enroll Now</button>
+</a>
+
+</div>
+
+{% endfor %}
+
 ---
 
 <!-- ENROLLED COHORTS -->
@@ -277,7 +277,7 @@ Go to Course
 
 </div>
 
-</div>
+
 <script>
     function toggleMenu(){
        let sidebar = document.getElementById("sidebar")
