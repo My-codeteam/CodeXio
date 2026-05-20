@@ -59,6 +59,16 @@ border-radius:6px;
 
 <h3>Live Classes</h3>
 
+<h3>Course Progress</h3>
+
+<div style="background:#1f2933;height:20px;border-radius:6px;overflow:hidden">
+
+<div style="width:{% widthratio progress|length modules|length 100 %}%;background:#ff3b3b;height:100%"></div>
+
+</div>
+
+<p>{{progress|length}} / {{modules|length}} Modules Completed</p>
+
 {% for session in sessions %}
 
 <div class="module-card">
@@ -81,7 +91,7 @@ border-radius:6px;
 
 <p>Status: Yet To Attend</p>
 
-<a href="{% url 'join_class' session.id %}">
+<a href="{{session.meeting_link}}" target="_blank">
 Join Class
 </a>
 
@@ -102,14 +112,7 @@ Join Class
 
 <strong>{{assignment.title}}</strong>
 
-{% with submission=None %}
-
-{% for sub in submissions %}
-{% if sub.assignment.id == assignment.id %}
-{% with submission=sub %}
-{% endwith %}
-{% endif %}
-{% endfor %}
+{% with submission=assignment.submission_set.first %}
 
 {% if submission %}
 
@@ -122,14 +125,20 @@ View Submission
 </p>
 
 {% if submission.grade %}
+
 <p>Grade: {{submission.grade}}</p>
+
 <p>Feedback: {{submission.feedback}}</p>
+
 {% else %}
+
 <p>Awaiting Review</p>
+
 {% endif %}
 
 {% else %}
- Not Attempted
+
+<p>Status: Not Submitted</p>
 
 {% endif %}
 
@@ -139,14 +148,21 @@ View Submission
 
 {% endfor %}
 
+<h3>Attendance</h3>
+
+<p>{{attendance_percent|floatformat:1}} %</p>
+
 {% endif %}
+
+{% if not course.is_live and enrolled %}
 
 <h3>Progress</h3>
 
 <p>
 {{progress|length}} / {{modules|length}} Modules Completed
 </p>
-
+{% endif %}
 </div>
+
 
 {% endblock %}

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession, Certificate
+from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession, Certificate, CompletedCourse, ModuleAccess
 from assignments.models import Assignment, Submission
 from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef
@@ -7,6 +7,10 @@ from django.utils.timezone import now
 from .utils import generate_certificate
 import pdfkit
 from django.http import HttpResponse
+import random
+import string
+from django.utils import timezone
+from datetime import timedelta
 
 def course_list(request):
 
@@ -56,6 +60,37 @@ def course_detail(request, course_id):
         course=course
     )
 
+    total_modules = modules.count()
+
+    # COMPLETED MODULES BY USER
+    completed_modules = progress.filter(completed=True).count()
+
+    # Check if course is completed
+    if total_modules > 0 and completed_modules == total_modules:
+
+        completed_course, created = CompletedCourse.objects.get_or_create(
+        user=request.user,
+        course=course
+        )
+
+        if created:
+            # Generate formatted certificate ID
+            year = timezone.now().year
+            course_code = course.title[:2].upper()
+
+            random_hash = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+
+            formatted_id = f"CM-{year}-{course_code}-{random_hash}"
+
+        Certificate.objects.get_or_create(
+            student=request.user,
+            course=course,
+            certificate_type="completion",
+            defaults={
+                "certificate_id": formatted_id
+            }
+        )
+
     # Attendance for live courses
 
     sessions = ClassSession.objects.filter(module__course=course)
@@ -73,6 +108,19 @@ def course_detail(request, course_id):
             user=request.user
     ).values_list("course_id", flat=True)
 
+    total_sessions = sessions.count()
+
+    attended_count = Attendance.objects.filter(
+        student=request.user,
+        session__in=sessions,
+        attended=True
+    ).count()
+
+    attendance_percent = 0
+
+    if total_sessions > 0:
+        attendance_percent = (attended_count / total_sessions) * 100
+
     context = {
         "course": course,
         "modules": modules,
@@ -82,7 +130,8 @@ def course_detail(request, course_id):
         "assignments": assignments,
         "sessions": sessions,
         'attended_sessions':attended_sessions,
-        'now':now()
+        'now':now(),
+        "attendance_percent": attendance_percent
     }
 
     return render(request, "courses/course_detail.html", context)
@@ -98,6 +147,29 @@ def module_detail(request, module_id):
 
     enrolled = False
 
+    access, created = ModuleAccess.objects.get_or_create(
+        user=request.user,
+        module=module,
+        defaults={
+            "deadline": timezone.now() + timedelta(days=5)
+        }
+    )
+
+    submitted = Submission.objects.filter(
+    student=request.user,
+    assignment__module=module
+    )
+
+    total_assignments = Assignment.count()
+
+    if submitted.count() == total_assignments:
+
+        Progress.objects.get_or_create(
+            user=request.user,
+            course=module.course,
+            module=module
+    )
+
     if request.user.is_authenticated:
         enrolled = Enrollment.objects.filter(
             user=request.user,
@@ -109,7 +181,8 @@ def module_detail(request, module_id):
 
     context = {
         "module": module,
-        "assignment": assignment
+        "assignment": assignment,
+        "deadline": access.deadline
     }
 
     return render(request, "courses/course_modules.html", context)
@@ -167,9 +240,18 @@ def submit_assignment(request, assignment_id):
 
     return redirect("courses:course_detail", course_id=assignment.module.course.id)
 
-def certificate_view(request, course_id):
+def certificate_view(request, completed_id):
 
-    certificate = generate_certificate(request.user, course_id)
+    completed = get_object_or_404(
+        CompletedCourse,
+        id=completed_id,
+        user=request.user
+    )
+
+    certificate = generate_certificate(
+        request.user,
+        completed.course.id
+    )
 
     if not certificate:
         return HttpResponse("Course not completed yet")
@@ -179,6 +261,7 @@ def certificate_view(request, course_id):
         "courses/certificates/certificate.html",
         {"certificate": certificate}
     )
+
 
 
 def download_certificate(request, certificate_id):
@@ -217,4 +300,21 @@ def verify_certificate(request, certificate_id):
         request,
         "courses/certificates/verify.html",
         {"certificate": certificate}
+    )
+
+@login_required
+def my_certificates(request):
+
+    certificates = CompletedCourse.objects.filter(
+        user=request.user
+    ).select_related("course")
+
+    context = {
+        "certificates": certificates
+    }
+
+    return render(
+        request,
+        "courses/certificates/my_certificates.html",
+        context
     )

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+h2>My Certificates</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Course</th>
+            <th>Completed</th>
+            <th>Certificate</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for cert in certificates %}
+
+        <tr>
+            <td>{{ cert.course.title }}</td>
+            <td>{{ cert.completed_at|date:"M d, Y" }}</td>
+
+            <td>
+                <a href="{% url 'certificate_view' cert.id %}">
+                    View Certificate
+                </a>
+            </td>
+        </tr>
+
+    {% empty %}
+
+        <tr>
+            <td colspan="3">
+                You haven't completed any courses yet.
+            </td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

@@ -27,10 +27,9 @@ urlpatterns = [
     name="complete_module"),
 
     path(
-        "view/<int:course_id>/",
-        views.certificate_view,
-        name="view_certificate"
-    ),
+    "certificate/<int:completed_id>/",
+    views.certificate_view,
+    name="certificate_view"),
 
     path(
         "download/<str:certificate_id>/",
@@ -43,5 +42,12 @@ urlpatterns = [
         views.verify_certificate,
         name="verify_certificate"
     ),
+
+    path(
+        "my-certificates/",
+        views.my_certificates,
+        name="my_certificates"
+    ),
+
 
 ]

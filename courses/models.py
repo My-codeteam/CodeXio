@@ -115,9 +115,23 @@ class ClassSession(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=200)
     date = models.DateTimeField()
+    meeting_link = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.course.title} - {self.title}"
+
+class ModuleAccess(models.Model):
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    module = models.ForeignKey(Module, on_delete=models.CASCADE)
+
+    opened_at = models.DateTimeField(auto_now_add=True)
+
+    deadline = models.DateTimeField()
+
+    class Meta:
+        unique_together = ["user", "module"]
 
 class Attendance(models.Model):
 
