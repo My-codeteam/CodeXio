@@ -35,11 +35,13 @@ margin-top:10px;
 <p>{{module.content}}</p>
 
 
-{% if course.is_live %}
+{% if module.course.course_type == "live" %}
 
 <div class="assignment">
 
 <h3>Assignment</h3>
+
+{% if assignment %}
 
 <p>{{assignment.description}}</p>
 
@@ -53,6 +55,17 @@ placeholder="Paste GitHub / Live URL"
 required
 >
 
+<button type="submit" class="submit-btn">
+Submit Assignment
+</button>
+
+</form>
+
+{% else %}
+
+<p>No assignment for this module yet.</p>
+
+{% endif %}
 </div>
 
 <h3>Assignment Deadline</h3>

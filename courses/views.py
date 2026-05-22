@@ -68,19 +68,24 @@ def course_detail(request, course_id):
     # Check if course is completed
     if total_modules > 0 and completed_modules == total_modules:
 
-        completed_course, created = CompletedCourse.objects.get_or_create(
-        user=request.user,
-        course=course
+        CompletedCourse.objects.get_or_create(
+            user=request.user,
+            course=course
         )
 
-        if created:
-            # Generate formatted certificate ID
-            year = timezone.now().year
-            course_code = course.title[:2].upper()
+        # Generate formatted certificate ID
+        year = timezone.now().year
 
-            random_hash = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        course_code = course.title[:2].upper()
 
-            formatted_id = f"CM-{year}-{course_code}-{random_hash}"
+        random_hash = ''.join(
+            random.choices(
+                string.ascii_uppercase + string.digits,
+                k=5
+            )
+        )
+
+        formatted_id = f"CM-{year}-{course_code}-{random_hash}"
 
         Certificate.objects.get_or_create(
             student=request.user,
@@ -160,15 +165,20 @@ def module_detail(request, module_id):
     assignment__module=module
     )
 
-    total_assignments = Assignment.count()
+    total_assignments = Assignment.objects.filter(
+    module=module
+    ).count()
 
-    if submitted.count() == total_assignments:
+    if submitted.count() == total_assignments and total_assignments > 0:
 
         Progress.objects.get_or_create(
             user=request.user,
             course=module.course,
-            module=module
-    )
+            module=module,
+            defaults={
+               "completed": True
+            }
+        )
 
     if request.user.is_authenticated:
         enrolled = Enrollment.objects.filter(
@@ -181,6 +191,7 @@ def module_detail(request, module_id):
 
     context = {
         "module": module,
+        "course": course,
         "assignment": assignment,
         "deadline": access.deadline
     }

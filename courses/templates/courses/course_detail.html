@@ -7,19 +7,24 @@
 max-width:900px;
 margin:auto;
 padding:40px 20px;
+color:white;
 }
 
 .module-card{
 background:#111826;
 padding:15px;
 border-radius:8px;
-margin-bottom:10px;
+margin-bottom:15px;
 border:1px solid #1f2933;
 }
 
 .module-card a{
-color:white;
+color:#4da6ff;
 text-decoration:none;
+}
+
+.module-card a:hover{
+text-decoration:underline;
 }
 
 .enroll-btn{
@@ -29,17 +34,50 @@ background:#ff3b3b;
 border:none;
 color:white;
 border-radius:6px;
+cursor:pointer;
+}
+
+.progress-bar{
+background:#1f2933;
+height:20px;
+border-radius:6px;
+overflow:hidden;
+margin-bottom:10px;
+}
+
+.progress-fill{
+background:#ff3b3b;
+height:100%;
+}
+
+.status-good{
+color:#22c55e;
+}
+
+.status-bad{
+color:#ef4444;
+}
+
+.status-warning{
+color:#facc15;
+}
+
+.deadline{
+margin-top:10px;
+font-size:14px;
+color:#bbb;
 }
 
 </style>
 
-
 <div class="container">
 
-<h1>{{course.title}}</h1>
+<h1>{{ course.title }}</h1>
 
-<p>{{course.description}}</p>
+<p>{{ course.description }}</p>
 
+
+<!-- MODULES -->
 
 <h3>Modules</h3>
 
@@ -48,121 +86,246 @@ border-radius:6px;
 <div class="module-card">
 
 <a href="{% url 'module_detail' module.id %}">
-{{module.title}}
+{{ module.title }}
 </a>
 
 </div>
 
+{% empty %}
+
+<p>No modules available yet.</p>
+
 {% endfor %}
 
-{% if course.is_live and enrolled %}
+
+
+<!-- LIVE COURSE SECTION -->
+
+{% if course.is_live and course.id in enrolled_course %}
 
 <h3>Live Classes</h3>
 
+
+<!-- COURSE PROGRESS -->
+
 <h3>Course Progress</h3>
 
-<div style="background:#1f2933;height:20px;border-radius:6px;overflow:hidden">
+<div class="progress-bar">
 
-<div style="width:{% widthratio progress|length modules|length 100 %}%;background:#ff3b3b;height:100%"></div>
+<div
+class="progress-fill"
+style="width:{% widthratio progress|length modules|length 100 %}%"
+></div>
 
 </div>
 
-<p>{{progress|length}} / {{modules|length}} Modules Completed</p>
+<p>
+{{ progress|length }} / {{ modules|length }} Modules Completed
+</p>
+
+
+
+<!-- LIVE SESSIONS -->
 
 {% for session in sessions %}
 
 <div class="module-card">
 
-<strong>{{session.module.title}}</strong>
+<strong>{{ session.module.title }}</strong>
 
-<p>Date: {{session.date}}</p>
+<p>{{ session.title }}</p>
+
+<p>Date: {{ session.date }}</p>
 
 {% if session.id in attended_sessions %}
 
-<p>Status: Attended</p>
+<p class="status-good">Status: Attended</p>
 
 {% else %}
 
 {% if session.date < now %}
 
-<p>Status: Not Attended</p>
+<p class="status-bad">Status: Missed Class</p>
 
 {% else %}
 
-<p>Status: Yet To Attend</p>
+<p class="status-warning">Status: Yet To Attend</p>
 
-<a href="{{session.meeting_link}}" target="_blank">
+<a href="{{ session.meeting_link }}" target="_blank">
 Join Class
 </a>
 
 {% endif %}
-
 {% endif %}
 
 </div>
 
+{% empty %}
+
+<p>No live sessions yet.</p>
+
 {% endfor %}
 
-<h3>Assignments</h3>
 
+
+<!-- ASSIGNMENTS -->
+
+<h3>Assignments</h3>
 
 {% for assignment in assignments %}
 
 <div class="module-card">
 
-<strong>{{assignment.title}}</strong>
+<strong>{{ assignment.title }}</strong>
 
-{% with submission=assignment.submission_set.first %}
-
-{% if submission %}
-
-<p>Status: Submitted</p>
+<p>{{ assignment.description }}</p>
 
 <p>
-<a href="{{submission.link}}" target="_blank">
+Deadline:
+{{ assignment.deadline }}
+</p>
+
+
+<!-- COUNTDOWN -->
+
+<div
+class="deadline"
+id="countdown-{{ assignment.id }}">
+</div>
+
+
+{% for submission in submissions %}
+
+{% if submission.assignment.id == assignment.id %}
+
+<p class="status-good">
+Status: Submitted
+</p>
+
+<p>
+<a href="{{ submission.link }}" target="_blank">
 View Submission
 </a>
 </p>
 
 {% if submission.grade %}
 
-<p>Grade: {{submission.grade}}</p>
+<p>
+Grade: {{ submission.grade }}
+</p>
 
-<p>Feedback: {{submission.feedback}}</p>
-
-{% else %}
-
-<p>Awaiting Review</p>
-
-{% endif %}
+<p>
+Feedback: {{ submission.feedback }}
+</p>
 
 {% else %}
 
-<p>Status: Not Submitted</p>
+<p class="status-warning">
+Awaiting Review
+</p>
 
 {% endif %}
 
-{% endwith %}
+{% endif %}
 
-</div>
+{% empty %}
+
+<p class="status-bad">
+Status: Not Submitted
+</p>
 
 {% endfor %}
 
-<h3>Attendance</h3>
-
-<p>{{attendance_percent|floatformat:1}} %</p>
-
-{% endif %}
-
-{% if not course.is_live and enrolled %}
-
-<h3>Progress</h3>
-
-<p>
-{{progress|length}} / {{modules|length}} Modules Completed
-</p>
-{% endif %}
 </div>
 
+
+<!-- ASSIGNMENT COUNTDOWN SCRIPT -->
+
+<script>
+
+var deadline{{ assignment.id }} =
+new Date("{{ assignment.deadline|date:'Y-m-d H:i:s' }}").getTime();
+
+var timer{{ assignment.id }} = setInterval(function(){
+
+var now = new Date().getTime();
+
+var distance = deadline{{ assignment.id }} - now;
+
+if(distance < 0){
+
+document.getElementById(
+"countdown-{{ assignment.id }}"
+).innerHTML = "Deadline Passed";
+
+clearInterval(timer{{ assignment.id }});
+
+return;
+
+}
+
+var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+
+var hours = Math.floor(
+(distance % (1000 * 60 * 60 * 24))
+/ (1000 * 60 * 60)
+);
+
+var minutes = Math.floor(
+(distance % (1000 * 60 * 60))
+/ (1000 * 60)
+);
+
+document.getElementById(
+"countdown-{{ assignment.id }}"
+).innerHTML =
+days + "d " +
+hours + "h " +
+minutes + "m remaining";
+
+}, 1000);
+
+</script>
+
+{% empty %}
+
+<p>No assignments yet.</p>
+
+{% endfor %}
+
+
+
+<!-- ATTENDANCE -->
+
+<h3>Attendance</h3>
+
+<p>{{ attendance_percent|floatformat:1 }}%</p>
+
+{% endif %}
+
+
+
+<!-- RECORDED COURSE SECTION -->
+
+{% if not course.is_live and course.id in enrolled_course %}
+
+<h3>Recorded Course Progress</h3>
+
+<div class="progress-bar">
+
+<div
+class="progress-fill"
+style="width:{% widthratio progress|length modules|length 100 %}%"
+></div>
+
+</div>
+
+<p>
+{{ progress|length }} / {{ modules|length }} Modules Completed
+</p>
+
+{% endif %}
+
+</div>
 
 {% endblock %}
