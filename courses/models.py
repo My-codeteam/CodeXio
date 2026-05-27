@@ -35,9 +35,30 @@ class Course(models.Model):
         default="recorded"
     )
 
+    discount_active = models.BooleanField(default=False)
+
+    discount_percentage = models.PositiveIntegerField(
+        default=0
+    )
+
+    first_200_discount = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0
+    )
+
+    discount_expiry = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+
     enrollment_open = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
 
 
 class Module(models.Model):
@@ -59,6 +80,9 @@ class Module(models.Model):
 
     class Meta:
         ordering = ["order"]
+
+    def __str__(self):
+        return self.title
 
 
 class Enrollment(models.Model):

@@ -22,7 +22,7 @@ class Submission(models.Model):
 
     student = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    file = models.FileField(upload_to='submissions/')
+    link = models.URLField(blank=True)
 
     grade = models.CharField(max_length=10, blank=True)
 

@@ -19,5 +19,9 @@ urlpatterns = [
     path("create-module/", views.create_module, name="create_module"),
     path("create-assignment/", views.create_assignment, name="create_assignment"),
     path('live-cohorts/', views.live_courses, name='live_courses'),
-    path('project-showcase/', views.project_showcase, name='project_showcase')
+    path('project-showcase/', views.project_showcase, name='project_showcase'),
+    path(
+    "verify-email/<uuid:token>/",
+    views.verify_email,
+    name="verify_email"),
 ]

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-Student Porta|Verify Cert
+Student Portal | Verify Certificate
 {% endblock %}
 
 {% block css_files %}
@@ -11,18 +11,131 @@ Student Porta|Verify Cert
 
 {% block content %}
 
-<h2>Certificate Verification</h2>
+<style>
 
-<p><strong>Student:</strong> {{ certificate.student.get_full_name }}</p>
+.verify-container{
+    max-width:800px;
+    margin:auto;
+    padding:40px 20px;
+    color:white;
+}
 
-<p><strong>Course:</strong> {{ certificate.course.title }}</p>
+.verify-card{
+    background:#111826;
+    border:1px solid #1f2933;
+    border-radius:14px;
+    padding:35px;
+}
 
-<p><strong>Date Issued:</strong> {{ certificate.issued_date }}</p>
+.verify-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-bottom:25px;
+}
 
-<p><strong>Certificate ID:</strong> {{ certificate.certificate_id }}</p>
+.verify-title{
+    font-size:30px;
+    font-weight:700;
+}
 
-<p style="color:green;">
-This certificate is valid and issued by CodexMingle.
-</p>
+.back-btn{
+    background:#ff3b3b;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:8px;
+    transition:0.3s;
+}
+
+.back-btn:hover{
+    background:#e52e2e;
+}
+
+.verify-info{
+    margin-bottom:18px;
+    font-size:17px;
+    line-height:1.7;
+}
+
+.verify-info strong{
+    color:#ff3b3b;
+}
+
+.valid-box{
+    margin-top:30px;
+    background:#0f2f1f;
+    border:1px solid #22c55e;
+    color:#22c55e;
+    padding:18px;
+    border-radius:10px;
+    font-weight:600;
+}
+
+@media(max-width:768px){
+
+    .verify-title{
+        font-size:24px;
+    }
+
+    .verify-card{
+        padding:25px 20px;
+    }
+
+    .verify-info{
+        font-size:15px;
+    }
+}
+
+</style>
+
+<div class="verify-container">
+
+    <div class="verify-card">
+
+        <div class="verify-header">
+
+            <h2 class="verify-title">
+                <i class="fa-solid fa-shield-check"></i>
+                Certificate Verification
+            </h2>
+
+            <a href="{% url 'courses:student_portal' %}" class="back-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                Dashboard
+            </a>
+
+        </div>
+
+        <div class="verify-info">
+            <strong>Student:</strong>
+            {{ certificate.student.get_full_name }}
+        </div>
+
+        <div class="verify-info">
+            <strong>Course:</strong>
+            {{ certificate.course.title }}
+        </div>
+
+        <div class="verify-info">
+            <strong>Date Issued:</strong>
+            {{ certificate.issued_date }}
+        </div>
+
+        <div class="verify-info">
+            <strong>Certificate ID:</strong>
+            {{ certificate.certificate_id }}
+        </div>
+
+        <div class="valid-box">
+            <i class="fa-solid fa-circle-check"></i>
+            This certificate is valid and issued by CodexMingle.
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}

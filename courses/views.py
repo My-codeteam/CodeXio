@@ -11,13 +11,45 @@ import random
 import string
 from django.utils import timezone
 from datetime import timedelta
+from users.models import User
+from decimal import Decimal
 
+@login_required
 def course_list(request):
 
     search = request.GET.get("search")
     free = request.GET.get("free")
 
     courses = Course.objects.filter(course_type="recorded")
+
+
+    # COURSE DISCOUNT
+
+    # FIRST 200 USERS DISCOUNT
+    total_users = User.objects.count()
+
+    for course in courses:
+
+        final_price_fee = course.price
+
+        discounted_amount = (Decimal(course.discount_percentage) / Decimal("100")) * final_price_fee
+
+        # NORMAL COURSE DISCOUNT
+        if (
+            course.discount_active and
+            course.discount_expiry and
+            timezone.now() < course.discount_expiry
+        ):
+
+            final_price =  final_price_fee - discounted_amount
+
+        # FIRST 200 USERS DISCOUNT
+        if total_users <= 200:
+
+            final_price = final_price_fee - discounted_amount
+
+        # attach dynamically
+        course.final_price = final_price
 
     if request.user.is_authenticated:
         enrollments = Enrollment.objects.filter(
@@ -36,12 +68,15 @@ def course_list(request):
         courses = courses.filter(price=0)
 
     context = {
-        "courses": courses
+        "courses": courses,
+        "final_price": final_price,
+        "final_price_fee": final_price_fee
     }
 
     return render(request, "courses/course_list.html", context)
 
 
+@login_required
 def course_detail(request, course_id):
 
     course = get_object_or_404(Course, id=course_id)
@@ -142,6 +177,7 @@ def course_detail(request, course_id):
     return render(request, "courses/course_detail.html", context)
 
 
+@login_required
 def module_detail(request, module_id):
 
     module = get_object_or_404(Module, id=module_id)
@@ -198,6 +234,7 @@ def module_detail(request, module_id):
 
     return render(request, "courses/course_modules.html", context)
 
+@login_required
 def complete_module(request, module_id):
 
     module = Module.objects.get(id=module_id)
@@ -239,18 +276,19 @@ def submit_assignment(request, assignment_id):
 
     if request.method == "POST":
 
-        file = request.FILES.get("file")
+        link = request.FILES.get("link")
 
         Submission.objects.update_or_create(
             assignment=assignment,
             student=request.user,
             defaults={
-                "file": file
+                "link": link
             }
         )
 
-    return redirect("courses:course_detail", course_id=assignment.module.course.id)
+    return redirect("course_detail", course_id=assignment.module.course.id)
 
+@login_required
 def certificate_view(request, completed_id):
 
     completed = get_object_or_404(
@@ -274,7 +312,7 @@ def certificate_view(request, completed_id):
     )
 
 
-
+@login_required
 def download_certificate(request, certificate_id):
 
     certificate = get_object_or_404(

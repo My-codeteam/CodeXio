@@ -9,11 +9,13 @@ import uuid
 class User(AbstractUser):
 
     student_id = models.CharField(max_length=20, unique=True, blank=True)
-
+    fullname = models.CharField(max_length=50)
     phone = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
+    email = models.EmailField(max_length=254, unique=True)
 
     profile_image = models.ImageField(upload_to='profiles/', blank=True)
+    is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
 
@@ -32,3 +34,26 @@ class User(AbstractUser):
             self.student_id = f"CM-{year}-{new_number:04d}"
 
         super().save(*args, **kwargs)
+
+
+
+class EmailVerification(models.Model):
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    token = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True
+    )
+
+    verified = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.user.username

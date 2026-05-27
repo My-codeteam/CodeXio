@@ -188,12 +188,20 @@ color:white;
 
 <h3>{{course.title}}</h3>
 
-<p>{{course.description|truncatewords:20}}</p>
+<p>{{course.description}}</p>
 
 {% if course.price == 0 %}
 <div class="price">Free</div>
 {% else %}
 <div class="price">₦{{course.price}}</div>
+
+{% if course.discount_percentage != 0%}
+
+<p style="color:#22c55e;">
+Discounted Price: ₦{{ final_price }}
+</p>
+
+{% endif %}
 {% endif %}
 {% if course.enrolled %}
 

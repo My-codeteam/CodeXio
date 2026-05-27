@@ -2,27 +2,213 @@
 {% load static %}
 
 {% block title %}
-Students projects
+Student Projects
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 {% endblock %}
 
 {% block content %}
-<h2>Student Projects</h2>
 
-{% for project in projects %}
+<style>
 
-<div class="project-card">
+.projects-wrapper{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+    color:white;
+}
 
-    <h3>{{ project.name }}</h3>
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+}
 
-    <p>{{ project.description }}</p>
+.page-title{
+    font-size:32px;
+    font-weight:700;
+}
 
-    <p>Language: {{ project.language }}</p>
+.back-btn{
+    background:#ff3b3b;
+    color:white;
+    padding:10px 18px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.3s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+}
 
-    <a href="{{ project.html_url }}" target="_blank">
-        View Project
-    </a>
+.back-btn:hover{
+    background:#e02d2d;
+    transform:translateY(-2px);
+}
+
+.projects-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
+    gap:20px;
+}
+
+.project-card{
+    background:#111826;
+    border:1px solid #1f2933;
+    border-radius:16px;
+    padding:24px;
+    transition:0.3s ease;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+}
+
+.project-card:hover{
+    transform:translateY(-5px);
+    border-color:#ff3b3b;
+    box-shadow:0 10px 25px rgba(0,0,0,0.35);
+}
+
+.project-title{
+    font-size:22px;
+    font-weight:700;
+    margin-bottom:12px;
+}
+
+.project-description{
+    color:#cbd5e1;
+    line-height:1.7;
+    margin-bottom:20px;
+}
+
+.language-badge{
+    display:inline-block;
+    background:#1f2933;
+    color:#4da6ff;
+    padding:8px 14px;
+    border-radius:30px;
+    font-size:14px;
+    font-weight:600;
+    margin-bottom:20px;
+}
+
+.project-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    background:#ff3b3b;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:10px;
+    font-weight:600;
+    transition:0.3s ease;
+}
+
+.project-link:hover{
+    background:#e02d2d;
+}
+
+.empty-projects{
+    background:#111826;
+    border:1px solid #1f2933;
+    padding:30px;
+    border-radius:16px;
+    text-align:center;
+    color:#cbd5e1;
+}
+
+@media(max-width:768px){
+
+    .projects-wrapper{
+        padding:25px 15px;
+    }
+
+    .page-title{
+        font-size:26px;
+    }
+
+    .project-card{
+        padding:20px;
+    }
+
+}
+
+</style>
+
+<div class="projects-wrapper">
+
+    <div class="top-bar">
+
+        <h2 class="page-title">
+            <i class="fas fa-code"></i>
+            Student Projects
+        </h2>
+
+        <a href="{% url 'courses:student_portal' %}" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+
+    </div>
+
+    {% if projects %}
+
+    <div class="projects-grid">
+
+        {% for project in projects %}
+
+        <div class="project-card">
+
+            <div>
+
+                <h3 class="project-title">
+                    {{ project.name }}
+                </h3>
+
+                <p class="project-description">
+                    {{ project.description|default:"No description provided." }}
+                </p>
+
+                <span class="language-badge">
+                    <i class="fas fa-laptop-code"></i>
+                    {{ project.language|default:"Not specified" }}
+                </span>
+
+            </div>
+
+            <a href="{{ project.html_url }}" target="_blank" class="project-link">
+                <i class="fab fa-github"></i>
+                View Project
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-projects">
+
+        <h3>No Student Projects Yet</h3>
+
+        <p>
+            Projects submitted by students will appear here.
+        </p>
+
+    </div>
+
+    {% endif %}
 
 </div>
 
-{% endfor %}
 {% endblock %}

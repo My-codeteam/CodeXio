@@ -4,7 +4,7 @@ from nltk.chat.util import Chat, reflections
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import *
-from users.models import User
+from users.models import User, EmailVerification
 from django.db.models.functions import Now
 from datetime import timedelta
 import requests
@@ -18,6 +18,10 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from assignments.models import Assignment
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
+
+
 
 # Download the nltk data if not already downloaded
 nltk.download('punkt')
@@ -236,15 +240,30 @@ def signup(request):
 
             user = authenticate(request, username=username, password=password)
 
-            if user.is_superuser or user.is_staff:
+            if user is not None:
+
+                if not user.is_verified:
+
+                    messages.error(
+                        request,
+                        "Please verify your email first."
+                    )
+
+                    return redirect("/signup")
+
                 login(request, user)
-                return redirect("courses:admin_dashboard")
-            elif user is not None:
-                login(request, user)
+
+                if user.is_staff or user.is_superuser:
+                    return redirect("courses:admin_dashboard")
+
                 return redirect("/student_portal")
 
             else:
-                messages.error(request, "Invalid username or password")
+
+                messages.error(
+                    request,
+                    "Invalid username or password"
+                )
 
 
         # REGISTER
@@ -255,6 +274,7 @@ def signup(request):
             phone = request.POST.get("phone")
             country = request.POST.get("country")
             password = request.POST.get("password")
+            fullname = request.POST.get("fullname")
 
             if User.objects.filter(username=username).exists():
                 messages.error(request,"Username already exists")
@@ -265,15 +285,71 @@ def signup(request):
                 email=email,
                 password=password,
                 phone=phone,
-                country=country
+                country=country,
+                fullname=fullname,
+                is_active=True
             )
 
-            login(request, user)
+            verification = EmailVerification.objects.create(
+                user=user
+            )
 
-            return redirect("/student_portal")
+            verification_link = (
+                f"http://127.0.0.1:8000/verify-email/"
+                f"{verification.token}/"
+            )
+
+            send_mail(
+                "Verify Your CodexMingle Account",
+
+                f"""
+Hello {user.username},
+
+Click the link below to verify your account:
+
+{verification_link}
+
+Welcome to CodexMingle.
+                """,
+
+                settings.DEFAULT_FROM_EMAIL,
+
+                [user.email],
+
+                fail_silently=False
+            )
+
+            messages.success(
+                request,
+                "Account created successfully. "
+                "Check your email to verify."
+            )
+
+            return redirect("signup")
 
     return render(request, "codexio_main/signupform.html")
 
+def verify_email(request, token):
+
+    verification = get_object_or_404(
+        EmailVerification,
+        token=token
+    )
+
+    verification.verified = True
+    verification.save()
+
+    user = verification.user
+
+    user.is_verified = True
+    user.save()
+
+    messages.success(
+        request,
+        "Email verified successfully."
+    )
+
+    return redirect("signup")
 
 def login_view(request):
 
@@ -290,6 +366,7 @@ def login_view(request):
 
     return render(request, "codexio_main/signupform.html")
 
+@login_required
 def enrolled_courses(request):
 
     enrollments = Enrollment.objects.filter(user=request.user)
@@ -400,6 +477,7 @@ def remove_user(request, user_id):
 
     return redirect('courses:admin_dashboard')
 
+@staff_member_required
 def create_module(request):
 
     if request.method == "POST":
@@ -424,6 +502,7 @@ def create_module(request):
 
     return redirect("courses:admin_dashboard")
 
+@staff_member_required
 def create_assignment(request):
 
     if request.method == "POST":
@@ -445,7 +524,7 @@ def create_assignment(request):
 
     return redirect("courses:admin_dashboard")
 
-
+@login_required
 def live_courses(request):
 
     now = timezone.now()
@@ -477,6 +556,7 @@ def live_courses(request):
 
     return render(request, "codexio_main/live_courses.html", context)
 
+@login_required
 def project_showcase(request):
 
     url = "https://api.github.com/users/codexmingleteam-sudo/repos"
