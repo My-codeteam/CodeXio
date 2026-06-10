@@ -7,6 +7,7 @@ import uuid
 import random
 import string
 from users.models import StudentReputation
+from django.urls import reverse
 
 # Create your models here.
 
@@ -239,7 +240,12 @@ def generate_certificate_code(course):
     else:
         course_code = "CR"
 
-    random_hash = ''.join(random.choices(string.hexdigits.upper(), k=5))
+    random_hash = ''.join(
+        random.choices(
+            string.ascii_uppercase + string.digits,
+            k=8
+        )
+    )
 
     return f"CM-{year}-{course_code}-{random_hash}"
 
@@ -265,7 +271,7 @@ class Certificate(models.Model):
     certificate_id = models.CharField(
         max_length=50,
         unique=True,
-        editable=False
+
     )
 
     issued_date = models.DateTimeField(auto_now_add=True)
@@ -282,6 +288,12 @@ class Certificate(models.Model):
             self.certificate_id = generate_certificate_code(self.course)
 
         super().save(*args, **kwargs)
+
+    def get_verification_url(self):
+        return reverse(
+            "verify_certificate",
+            args=[self.certificate_id]
+        )
 
     class Meta:
         unique_together = ['student', 'course', 'certificate_type']

@@ -16,7 +16,7 @@ from decimal import Decimal
 from users.models import StudentReputation
 from .forms import MentorRequestForm
 from django.contrib import messages
-
+from django.urls import reverse
 
 @login_required
 def course_list(request):
@@ -107,18 +107,19 @@ def course_detail(request, course_id):
     # Check if course is completed
     if total_modules > 0 and completed_modules == total_modules:
 
-        CompletedCourse.objects.get_or_create(
-            user=request.user,
-            course=course
+        completed_course, created = CompletedCourse.objects.get_or_create(
+        user=request.user,
+        course=course
         )
 
-        reputation, created = StudentReputation.objects.get_or_create(
-         user=request.user
-        )
+        if created:
 
-        reputation.completed_courses += 1
+           reputation, _ = StudentReputation.objects.get_or_create(
+           user=request.user
+           )
 
-        reputation.calculate_score()
+           reputation.completed_courses += 1
+           reputation.calculate_score()
 
         # Generate formatted certificate ID
         year = timezone.now().year
@@ -134,14 +135,16 @@ def course_detail(request, course_id):
 
         formatted_id = f"CM-{year}-{course_code}-{random_hash}"
 
-        Certificate.objects.get_or_create(
-            student=request.user,
-            course=course,
-            certificate_type="completion",
-            defaults={
-                "certificate_id": formatted_id
-            }
+
+        certificate, created = Certificate.objects.get_or_create(
+          student=request.user,
+          course=course,
+          certificate_type="completion",
+          defaults={
+            "certificate_id": formatted_id
+          }
         )
+
 
     # Attendance for live courses
 
@@ -330,12 +333,21 @@ def certificate_view(request, completed_id):
     if not certificate:
         return HttpResponse("Course not completed yet")
 
+    verification_url = request.build_absolute_uri(
+        reverse(
+            "verify_certificate",
+            args=[certificate.certificate_id]
+        )
+    )
+
     return render(
         request,
         "courses/certificates/certificate.html",
-        {"certificate": certificate}
+        {
+            "certificate": certificate,
+            "verification_url": verification_url
+        }
     )
-
 
 @login_required
 def download_certificate(request, certificate_id):

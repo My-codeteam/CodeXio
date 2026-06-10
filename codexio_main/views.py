@@ -255,6 +255,8 @@ def student_portal(request):
     # Leaderboard
     top_students = StudentReputation.objects.select_related(
         "user"
+    ).filter(
+       total_score__gt=0
     ).order_by(
         "-total_score"
     )[:10]
