@@ -4,24 +4,27 @@ from nltk.chat.util import Chat, reflections
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import *
-from users.models import User, EmailVerification
+from users.models import User, EmailVerification, StudentReputation
 from django.db.models.functions import Now
 from datetime import timedelta
 import requests
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 
 User = get_user_model()
-from courses.models import Course, Enrollment, UpdateNotification, Module
+from courses.models import Course, Enrollment, UpdateNotification, Module, CompletedCourse
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from assignments.models import Assignment
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
-
-
+from django.utils.timezone import now
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 # Download the nltk data if not already downloaded
 nltk.download('punkt')
@@ -177,14 +180,44 @@ def student_portal(request):
     contributors = []
 
     try:
+
         url = "https://api.github.com/repos/codexmingleteam-sudo/student-projects/contributors"
+
         response = requests.get(url)
 
         if response.status_code == 200:
+
             contributors = response.json()[:10]
 
-    except:
+            # Update GitHub contributions in reputation table
+            for contributor in contributors:
+
+                github_name = contributor["login"]
+
+                contributions = contributor["contributions"]
+
+                try:
+
+                    user = User.objects.get(
+                        github_username=github_name
+                    )
+
+                    reputation, created = StudentReputation.objects.get_or_create(
+                        user=user
+                    )
+
+                    reputation.github_contributions = contributions
+
+                    reputation.calculate_score()
+
+                except User.DoesNotExist:
+
+                    pass
+
+    except Exception:
+
         contributors = []
+
 
     total_courses = Course.objects.count()
 
@@ -194,18 +227,38 @@ def student_portal(request):
         user=request.user
     ).count()
 
-    courses = Course.objects.order_by('-id')[:6]
+    courses = Course.objects.order_by("-id")[:6]
 
     updates = UpdateNotification.objects.all()
 
-    # GitHub repos
-    url = "https://api.github.com/users/codexmingleteam-sudo/repos"
 
-    response = requests.get(url)
+    # GitHub repos count
+    total_repos = 0
 
-    repos = response.json()
+    try:
 
-    total_repos = len(repos)
+        url = "https://api.github.com/users/codexmingleteam-sudo/repos"
+
+        response = requests.get(url)
+
+        if response.status_code == 200:
+
+            repos = response.json()
+
+            total_repos = len(repos)
+
+    except Exception:
+
+        pass
+
+
+    # Leaderboard
+    top_students = StudentReputation.objects.select_related(
+        "user"
+    ).order_by(
+        "-total_score"
+    )[:10]
+
 
     context = {
 
@@ -221,11 +274,17 @@ def student_portal(request):
 
         "courses": courses,
 
-        "contributors": contributors
+        "contributors": contributors,
+
+        "top_students": top_students,
 
     }
 
-    return render(request, 'codexio_main/dashboard/dashboard.html', context)
+    return render(
+        request,
+        "codexio_main/dashboard/dashboard.html",
+        context
+    )
 
 
 def signup(request):
@@ -276,8 +335,8 @@ def signup(request):
             password = request.POST.get("password")
             fullname = request.POST.get("fullname")
 
-            if User.objects.filter(username=username).exists():
-                messages.error(request,"Username already exists")
+            if User.objects.filter(email=email, username=username).exists():
+                messages.error(request,"User already exists")
                 return redirect("login_submit")
 
             user = User.objects.create_user(
@@ -294,38 +353,39 @@ def signup(request):
                 user=user
             )
 
-            verification_link = (
-                f"http://127.0.0.1:8000/verify-email/"
-                f"{verification.token}/"
+            verification_link = request.build_absolute_uri(
+    f"/verify-email/{verification.token}/"
+)
+
+            subject = "Verify Your Email • CodexMingle community"
+
+            html_content = render_to_string(
+               "codexio_main/emails/verify_email.html",
+               {
+                  "user": user,
+                  "verification_link": verification_link
+                }
             )
 
-            send_mail(
-                "Verify Your CodexMingle Account",
+            text_content = strip_tags(html_content)
 
-                f"""
-Hello {user.username},
-
-Click the link below to verify your account:
-
-{verification_link}
-
-Welcome to CodexMingle.
-                """,
-
-                settings.DEFAULT_FROM_EMAIL,
-
-                [user.email],
-
-                fail_silently=False
+            email_message = EmailMultiAlternatives(
+               subject,
+               text_content,
+               settings.DEFAULT_FROM_EMAIL,
+               [user.email]
             )
+
+            email_message.attach_alternative(html_content, "text/html")
+
+            email_message.send()
 
             messages.success(
-                request,
-                "Account created successfully. "
-                "Check your email to verify."
+               request,
+               "Account created successfully. Check your email to verify."
             )
 
-            return redirect("signup")
+            return redirect("/signup")
 
     return render(request, "codexio_main/signupform.html")
 
@@ -344,12 +404,14 @@ def verify_email(request, token):
     user.is_verified = True
     user.save()
 
+    user.verified_at = now()
+
     messages.success(
         request,
         "Email verified successfully."
     )
 
-    return redirect("signup")
+    return redirect("/signup")
 
 def login_view(request):
 

@@ -6,9 +6,68 @@ from codexio_main.models import Update
 import uuid
 import random
 import string
+from users.models import StudentReputation
+
 # Create your models here.
 
 from users.models import User
+
+from django.conf import settings
+
+
+class MentorRequest(models.Model):
+
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+        ("completed", "Completed"),
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    course = models.ForeignKey(
+        "Course",
+        on_delete=models.CASCADE
+    )
+
+    challenge = models.TextField()
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+    meeting_link = models.URLField(
+        blank=True,
+        null=True
+    )
+
+    admin_notes = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    @staticmethod
+    def remaining_sessions(user, course):
+
+        used = MentorRequest.objects.filter(
+            user=user,
+            course=course,
+            status__in=["approved", "completed"]
+        ).count()
+
+        return max(0, 3 - used)
 
 class Course(models.Model):
     COURSE_TYPE = (
@@ -81,8 +140,6 @@ class Module(models.Model):
     class Meta:
         ordering = ["order"]
 
-    def __str__(self):
-        return self.title
 
 
 class Enrollment(models.Model):
@@ -239,6 +296,7 @@ class CompletedCourse(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     completed_at = models.DateTimeField(auto_now_add=True)
+
 
     class Meta:
         unique_together = ["user", "course"]

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession, Certificate, CompletedCourse, ModuleAccess
+from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession, Certificate, CompletedCourse, MentorRequest, ModuleAccess
 from assignments.models import Assignment, Submission
 from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef
@@ -13,6 +13,10 @@ from django.utils import timezone
 from datetime import timedelta
 from users.models import User
 from decimal import Decimal
+from users.models import StudentReputation
+from .forms import MentorRequestForm
+from django.contrib import messages
+
 
 @login_required
 def course_list(request):
@@ -108,6 +112,14 @@ def course_detail(request, course_id):
             course=course
         )
 
+        reputation, created = StudentReputation.objects.get_or_create(
+         user=request.user
+        )
+
+        reputation.completed_courses += 1
+
+        reputation.calculate_score()
+
         # Generate formatted certificate ID
         year = timezone.now().year
 
@@ -161,6 +173,11 @@ def course_detail(request, course_id):
     if total_sessions > 0:
         attendance_percent = (attended_count / total_sessions) * 100
 
+    mentor_remaining = MentorRequest.remaining_sessions(
+    request.user,
+    course
+    )
+
     context = {
         "course": course,
         "modules": modules,
@@ -171,6 +188,7 @@ def course_detail(request, course_id):
         "sessions": sessions,
         'attended_sessions':attended_sessions,
         'now':now(),
+        "mentor_remaining": mentor_remaining,
         "attendance_percent": attendance_percent
     }
 
@@ -285,6 +303,13 @@ def submit_assignment(request, assignment_id):
                 "link": link
             }
         )
+    reputation, created = StudentReputation.objects.get_or_create(
+    user=request.user
+    )
+
+    reputation.assignments_submitted += 1
+
+    reputation.calculate_score()
 
     return redirect("course_detail", course_id=assignment.module.course.id)
 
@@ -366,4 +391,70 @@ def my_certificates(request):
         request,
         "courses/certificates/my_certificates.html",
         context
+    )
+
+
+@login_required
+def request_mentor(request, course_id):
+
+    course = get_object_or_404(
+        Course,
+        id=course_id
+    )
+
+    remaining = MentorRequest.remaining_sessions(
+        request.user,
+        course
+    )
+
+    if remaining <= 0:
+
+        messages.error(
+            request,
+            "You have used all mentor sessions."
+        )
+
+        return redirect(
+            "course_detail",
+            course_id=course.id
+        )
+
+    if request.method == "POST":
+
+        form = MentorRequestForm(request.POST)
+
+        if form.is_valid():
+
+            mentor_request = form.save(
+                commit=False
+            )
+
+            mentor_request.user = request.user
+
+            mentor_request.course = course
+
+            mentor_request.save()
+
+            messages.success(
+                request,
+                "Request submitted successfully."
+            )
+
+            return redirect(
+                "course_detail",
+                course_id=course.id
+            )
+
+    else:
+
+        form = MentorRequestForm()
+
+    return render(
+        request,
+        "courses/request_mentor.html",
+        {
+            "form": form,
+            "course": course,
+            "remaining": remaining
+        }
     )

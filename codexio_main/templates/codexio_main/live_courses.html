@@ -40,6 +40,11 @@ left:0;
 transition:0.3s;
 }
 
+.main{
+margin-left:230px;
+padding:30px 40px;
+transition:0.3s;
+}
 
 /* SIDEBAR TITLE */
 
@@ -85,6 +90,11 @@ border-left:4px solid #ff3b3b;
 left:-230px;
 }
 
+.main{
+margin-left:0;
+padding:20px;
+}
+
 .sidebar.active{
 left:0;
 width:100%;
@@ -94,6 +104,8 @@ z-index:999;
 
 .menu-btn{
 display:block;
+z-index: 7000;
+position: relative;
 }
 
 }
@@ -284,5 +296,8 @@ Go to Course
        sidebar.classList.toggle("active")
     }
 </script>
+
+</div>
+</div>
 
 {% endblock %}

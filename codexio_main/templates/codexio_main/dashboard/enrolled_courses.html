@@ -71,6 +71,11 @@ color:white;
 border-left:4px solid #ff3b3b;
 }
 
+.main{
+margin-left:230px;
+padding:30px 40px;
+transition:0.3s;
+}
 
 /* MOBILE RESPONSIVE NAVIGATION */
 
@@ -78,6 +83,11 @@ border-left:4px solid #ff3b3b;
 
 .sidebar{
 left:-230px;
+}
+
+.main{
+margin-left:0;
+padding:20px;
 }
 
 .sidebar.active{
@@ -89,6 +99,8 @@ z-index:999;
 
 .menu-btn{
 display:block;
+position: relative;
+z-index: 7000;
 }
 
 }
@@ -181,9 +193,14 @@ color:white;
 <script>
     function toggleMenu(){
        let sidebar = document.getElementById("sidebar")
+       let menuBtn = document.getElementById("menuBtn")
+
        sidebar.classList.toggle("active")
        menuBtn.classList.toggle("active")
     }
 </script>
+
+</div>
+</div>
 
 {% endblock %}

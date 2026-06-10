@@ -55,7 +55,7 @@ def edit_profile(request):
 
     if request.method == "POST":
 
-        user.username = request.POST.get("username")
+        user.fullname = request.POST.get("fullname")
         user.phone = request.POST.get("phone")
 
         if request.FILES.get("profile_image"):

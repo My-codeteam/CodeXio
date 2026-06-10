@@ -384,6 +384,10 @@ transition: left 0.35s ease;
 {% endif %}
 
 <p>{{ request.user.username }}</p>
+<p>{{ request.user.email }}</p>
+<p>{{ request.user.fullname }}</p>
+<p>{{ request.user.country }}</p>
+<p>{{ request.user.phone }}</p>
 <small>{{ request.user.student_id }}</small>
 
 </div>
@@ -448,7 +452,7 @@ transition: left 0.35s ease;
 {% for course in courses %}
 <div class="course-card">
 <h4>{{ course.title }}</h4>
-<p>{{ course.description }}</p>
+<p>{{ course.description|truncatewords:20 }}</p>
 </div>
 {% endfor %}
 
@@ -476,13 +480,13 @@ transition: left 0.35s ease;
 
 <tbody>
 
-{% for user in contributors %}
+{% for student in top_students %}
 <tr>
 <td><img src="{{ user.avatar_url }}" width="35" style="border-radius:50%;">
-{{ user.login }}</td>
-<td>5</td>
-<td>{{ user.contributions }}</td>
-<td>{{ forloop.counter }}</td>
+{{ student.user.username }}</td>
+<td>{{ student.completed_courses }}</td>
+<td>{{ student.github_contributions }}</td>
+<td>{{ student.total_score }}</td>
 </tr>
 
 {% empty %}
@@ -585,13 +589,16 @@ chat.innerHTML += "<br><b>You:</b> "+userText
 
 let botReply="I'm not sure yet. Try asking about courses, assignments, certificates, ebooks, or community."
 
+if(userText.includes("hi")){
+    botReply= "Hello there. I am Nexora AI, Codexmingle's assist bot design to guide you through the website. I might not be able to answer all of your questions, which is why your feedback through email is invaluable. Just type help if you do not know what I can answer."
+}
 
 if(userText.includes("course")){
 botReply="You can view your courses in the Courses section on the sidebar."
 }
 
 else if(userText.includes("assignment")){
-botReply="To submit assignments, go to the Assignments page and upload your solution."
+botReply="To submit assignments, go to the course module page and upload your a link to your solution. Submits are only allowed in live cohort classes."
 }
 
 else if(userText.includes("certificate")){
@@ -599,11 +606,11 @@ botReply="Certificates appear after completing a course. Check the Certificates 
 }
 
 else if(userText.includes("ebook") || userText.includes("book")){
-botReply="Learning materials can be downloaded in the Ebook section."
+botReply="Learning materials can be downloaded through the Ebook link in the navigation menu."
 }
 
 else if(userText.includes("community")){
-botReply="You can join CodexMingle's community through the Community section."
+botReply="You can join CodexMingle's learning community through the Community link in the navigation."
 }
 
 else if(userText.includes("help")){

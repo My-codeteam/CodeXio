@@ -212,7 +212,7 @@ justify-content:center;
 
 <h1>{{ course.title }}</h1>
 
-<p>{{ course.description }}</p>
+<p>{{ course.description|linebreaks }}</p>
 
 </div>
 
@@ -440,6 +440,31 @@ minutes + "m remaining";
 <p>{{ attendance_percent|floatformat:1 }}%</p>
 
 </div>
+
+<h3>Meet Your Mentor</h3>
+
+<p>
+Remaining Sessions:
+{{ mentor_remaining }}/3
+</p>
+
+{% if mentor_remaining > 0 %}
+
+<a href="{% url 'request_mentor' course.id %}">
+<button class="enroll-btn">
+Request Mentor Session
+</button>
+</a>
+
+{% else %}
+
+<button
+class="enroll-btn disabled"
+disabled>
+No Sessions Remaining
+</button>
+
+{% endif %}
 
 {% endif %}
 

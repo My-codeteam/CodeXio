@@ -112,9 +112,87 @@
   text-align: center;
   font-size: 0.9em;
 }
+
+.message-container{
+  width:100%;
+  max-width:400px;
+  margin:20px auto;
+}
+
+.alert{
+  padding:14px;
+  border-radius:8px;
+  margin-bottom:12px;
+  font-size:14px;
+  font-weight:500;
+  animation:fadeIn 0.4s ease;
+}
+
+.alert-success{
+  background:#052e16;
+  border:1px solid #22c55e;
+  color:#86efac;
+}
+
+.alert-error{
+  background:#450a0a;
+  border:1px solid #ef4444;
+  color:#fca5a5;
+}
+
+.alert-warning{
+  background:#3b2f00;
+  border:1px solid #facc15;
+  color:#fde68a;
+}
+
+.alert-info{
+  background:#172554;
+  border:1px solid #3b82f6;
+  color:#93c5fd;
+}
+
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:translateY(-10px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
   </style>
 
   <div class="form-toggle-container">
+      {% if messages %}
+
+      <div class="message-container">
+
+    {% for message in messages %}
+
+        <div class="alert
+        {% if message.tags == 'success' %}
+            alert-success
+        {% elif message.tags == 'error' %}
+            alert-error
+        {% elif message.tags == 'warning' %}
+            alert-warning
+        {% else %}
+            alert-info
+        {% endif %}
+        ">
+
+           {{ message }}
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
     <!-- Toggle Buttons -->
     <div class="toggle-buttons">
       <button onclick="showLogin()">Login</button>
@@ -139,7 +217,7 @@
         {% csrf_token %}
 
         <input type="text" name="username" placeholder="Username">
-        <input type="text" name="full_name" placeholder="Full_name">
+        <input type="text" name="fullname" placeholder="Full_name">
         <input type="email" name="email" placeholder="Email">
         <input type="text" name="phone" placeholder="Phone">
         <input type="text" name="country" placeholder="Country">

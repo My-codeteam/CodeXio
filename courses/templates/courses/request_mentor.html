@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}
+Request Mentor Session
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.container{
+max-width:800px;
+margin:auto;
+padding:40px 20px;
+color:white;
+}
+
+.card{
+background:#111826;
+border:1px solid #1f2933;
+padding:25px;
+border-radius:10px;
+}
+
+.card h2{
+margin-bottom:20px;
+}
+
+.info-box{
+background:#0f172a;
+padding:15px;
+border-radius:8px;
+margin-bottom:20px;
+border-left:4px solid #22c55e;
+}
+
+textarea{
+width:100%;
+padding:12px;
+background:#0f172a;
+border:1px solid #333;
+border-radius:8px;
+color:white;
+min-height:180px;
+resize:vertical;
+}
+
+.submit-btn{
+margin-top:20px;
+background:#ff3b3b;
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.submit-btn:hover{
+opacity:0.9;
+}
+
+.back-btn{
+display:inline-block;
+margin-top:15px;
+color:#4da6ff;
+text-decoration:none;
+}
+
+.message{
+padding:12px;
+margin-bottom:15px;
+border-radius:8px;
+}
+
+.success{
+background:#14532d;
+}
+
+.error{
+background:#7f1d1d;
+}
+
+</style><div class="container">{% if messages %}
+
+{% for message in messages %}
+
+    <div class="message {% if message.tags == 'success' %}success{% else %}error{% endif %}">
+        {{ message }}
+    </div>
+
+{% endfor %}
+
+{% endif %}
+
+<div class="card"><h2>Meet Your Mentor</h2><p>
+Course:
+<strong>{{ course.title }}</strong>
+</p><div class="info-box"><p>
+Remaining mentor sessions:
+<strong>{{ remaining }}/3</strong>
+</p><p>
+Use mentor sessions when you have tried solving a problem yourself but still need guidance.
+</p></div><form method="POST">{% csrf_token %}
+
+<label>
+Describe your challenge:
+</label>{{ form.challenge }}
+
+<button
+type="submit"
+class="submit-btn">
+Submit Request
+</button>
+
+</form><a
+href="{% url 'course_detail' course.id %}"
+class="back-btn">
+← Back to Course
+</a>
+
+</div></div>{% endblock %}

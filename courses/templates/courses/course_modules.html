@@ -178,9 +178,9 @@ text-align:center;
 
 <div class="content-box">
 
-<h1>{{ module.title }}</h1>
+<h1>{{ module.title|linebreaks }}</h1>
 
-<p>{{ module.content }}</p>
+<p>{{ module.content|linebreaks }}</p>
 
 {% if module.course.course_type == "live" %}
 

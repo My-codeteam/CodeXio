@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from decouple import config
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -159,3 +160,17 @@ load_dotenv()
 
 FLW_PUBLIC_KEY = os.getenv("FLW_PUBLIC_KEY")
 FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY")
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+
+EMAIL_PORT = 587
+
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'codexmingleteam@gmail.com'
+
+EMAIL_HOST_PASSWORD = 'pddesvverklaujpt'
+
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

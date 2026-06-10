@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body{
+            font-family:Arial;
+            background:#f4f4f4;
+            padding:40px;
+        }
+
+        .container{
+            max-width:600px;
+            margin:auto;
+            background:white;
+            padding:40px;
+            border-radius:10px;
+        }
+
+        .btn{
+            display:inline-block;
+            padding:12px 25px;
+            background:#ff3b3b;
+            color:white !important;
+            text-decoration:none;
+            border-radius:6px;
+            margin-top:20px;
+        }
+
+        h1{
+            color:#111;
+        }
+
+        p{
+            color:#444;
+            line-height:1.7;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Welcome to CodexMingle 🚀</h1>
+
+<p>
+Hello {{ user.username }},
+</p>
+
+<p>
+Thank you for registering on CodexMingle.
+Please verify your email address to activate your account.
+</p>
+
+<a href="{{ verification_link }}" class="btn">
+Verify My Account
+</a>
+
+<p>
+If the button doesn't work, use this link:
+</p>
+
+<p>
+{{ verification_link }}
+</p>
+
+<p>
+Thank you,<br>
+CodexMingle Team
+</p>
+
+</div>
+
+</body>
+</html>

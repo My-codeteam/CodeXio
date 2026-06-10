@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from django.conf import settings
 
 # Create your models here.
 from django.contrib.auth.models import AbstractUser
@@ -13,9 +14,17 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20)
     country = models.CharField(max_length=100)
     email = models.EmailField(max_length=254, unique=True)
-
+    github_username = models.CharField(
+    max_length=100,
+    blank=True,
+    null=True
+    )
     profile_image = models.ImageField(upload_to='profiles/', blank=True)
     is_verified = models.BooleanField(default=False)
+    verified_at = models.DateTimeField(
+    null=True,
+    blank=True
+    )
 
     def save(self, *args, **kwargs):
 
@@ -35,6 +44,12 @@ class User(AbstractUser):
 
         super().save(*args, **kwargs)
 
+        if not self.github_username:
+
+            self.github_username = self.username
+
+
+        super().save(*args, **kwargs)
 
 
 class EmailVerification(models.Model):
@@ -57,3 +72,54 @@ class EmailVerification(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class StudentReputation(models.Model):
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+
+    completed_courses = models.IntegerField(default=0)
+
+    github_contributions = models.IntegerField(default=0)
+
+    assignments_submitted = models.IntegerField(default=0)
+
+    live_attendance = models.IntegerField(default=0)
+
+    mentor_sessions = models.IntegerField(default=0)
+
+    total_score = models.IntegerField(default=0)
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def calculate_score(self):
+
+        self.total_score = (
+
+            (self.completed_courses * 10)
+
+            +
+
+            (self.github_contributions * 1)
+
+            +
+
+            (self.assignments_submitted * 2)
+
+            +
+
+            (self.live_attendance * 3)
+
+            +
+
+            (self.mentor_sessions * 5)
+
+        )
+
+        self.save()
+
+    def __str__(self):
+        return f"{self.user.username} Reputation"

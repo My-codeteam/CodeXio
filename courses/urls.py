@@ -49,5 +49,11 @@ urlpatterns = [
         name="my_certificates"
     ),
 
+    path(
+       "mentor-request/<int:course_id>/",
+       views.request_mentor,
+       name="request_mentor"
+    ),
+
 
 ]

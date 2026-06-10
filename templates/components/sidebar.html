@@ -6,7 +6,7 @@
 <a href="{% url 'course_list' %}" class="{% if request.resolver_match.url_name == 'course_list' %}active{% endif %}">Courses</a>
 <a href="{% url 'courses:live_courses' %}" class="{% if request.resolver_match.url_name == 'live_courses' %}active{% endif %}">Live Cohorts</a>
 <a href="{% url 'courses:enrolled_courses' %}" class="{% if request.resolver_match.url_name == 'enrolled_courses'%}active{% endif %}">Enrolled</a>
-<a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Editor</a>
+<a href="/coming_soon">Editor</a>
 <a href="https://codexmingle.gumroad.com/?_gl=1*u1nkn8*_ga*MTg2NTU3NTE3NS4xNzc5MDM5NDk2*_ga_6LJN6D94N6*czE3NzkwMzk0OTYkbzEkZzEkdDE3NzkwMzk1OTUkajM3JGwwJGgw" target="_blank">Ebooks</a>
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Community</a>
 <a href="{% url 'my_certificates' %}" class="{% if request.resolver_match.url_name == 'my_certificates' %}active{% endif %}">Certificates</a>
