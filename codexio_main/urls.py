@@ -24,4 +24,9 @@ urlpatterns = [
     "verify-email/<uuid:token>/",
     views.verify_email,
     name="verify_email"),
+    path(
+    "feedback/",
+    views.feedback,
+    name="feedback"
+    )
 ]

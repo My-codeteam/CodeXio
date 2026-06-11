@@ -141,6 +141,50 @@ chatbot_pairs = [
 def home(request):
     return render(request, 'codexio_main/index.html')
 
+@login_required
+def feedback(request):
+
+    if request.method == "POST":
+
+        subject = request.POST.get("subject")
+
+        message = request.POST.get("message")
+
+        send_mail(
+            subject=f"[CodexMingle Feedback] {subject}",
+            message=f"""
+From: {request.user.fullname}
+Username: {request.user.username}
+Email: {request.user.email}
+
+Message:
+{message}
+""",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[
+                settings.DEFAULT_FROM_EMAIL
+            ],
+            fail_silently=False
+        )
+
+        Feedback.objects.create(
+          user=request.user,
+          subject=subject,
+          message=message
+        )
+
+        messages.success(
+            request,
+            "Thank you! Your feedback has been sent."
+        )
+
+        return redirect("/feedback")
+
+    return render(
+        request,
+        "codexio_main/feedback.html"
+    )
+
 def custom_404(request, exception):
     return render(request, 'codexio_main/404.html', status=404)
 
@@ -330,26 +374,42 @@ def signup(request):
         # REGISTER
         if "signup_submit" in request.POST:
 
-            username = request.POST.get("username")
-            email = request.POST.get("email")
-            phone = request.POST.get("phone")
-            country = request.POST.get("country")
-            password = request.POST.get("password")
-            fullname = request.POST.get("fullname")
+            username = request.POST.get("username", "").strip()
+            email = request.POST.get("email", "").strip()
+            phone = request.POST.get("phone", "").strip()
+            country = request.POST.get("country", "").strip()
+            password = request.POST.get("password", "").strip()
+            fullname = request.POST.get("fullname", "").strip()
 
             if User.objects.filter(email=email, username=username).exists():
                 messages.error(request,"User already exists")
                 return redirect("login_submit")
 
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                phone=phone,
-                country=country,
-                fullname=fullname,
-                is_active=True
-            )
+            if not all([
+                username,
+                email,
+                phone,
+                country,
+                password,
+                fullname
+            ]):
+
+               messages.error(
+                  request,
+                  "All fields are required."
+               )
+
+            else:
+
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    phone=phone,
+                    country=country,
+                    fullname=fullname,
+                    is_active=True
+                )
 
             verification = EmailVerification.objects.create(
                 user=user
@@ -384,7 +444,7 @@ def signup(request):
 
             messages.success(
                request,
-               "Account created successfully. Check your email to verify."
+               "Account created successfully. Check your email to verify. If you do not see it in your regular mails, please check your spam folders."
             )
 
             return redirect("/signup")

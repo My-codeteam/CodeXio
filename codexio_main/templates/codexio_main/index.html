@@ -16,8 +16,6 @@
 
 {% block content %}
 
-</body>
-</html>
 <div class="floating-social">
 
     <a href="mailto:codexmingleteam@gamil.com" target="_blank"><i class="fas fa-envelope"></i></a>
@@ -39,15 +37,16 @@
     <ul id="nav-menu">
     <li><a href="#">Home</a></li>
     <li><a href="/about">About</a>
+    <li><a href="/feedback" target="_blank">Feedback</a></li>
     </li>
     <li><a href="https://dev.to/codexmingle_community" target="_blank">Blog</a></li>
     {% if not user.is_authenticated %}
     <li>
-        <a href="/signup">Login/Signup</a>
+        <a href="/signup" target="_blank">Login/Signup</a>
     </li>
     {% else %}
     <li>
-        <a href="/student_portal">Dashboard</a>
+        <a href="/student_portal" target="_blank">Dashboard</a>
     </li>
     {% endif %}
     </ul>
@@ -244,6 +243,15 @@
 
 </section>
 
+<section class="partners">
+    <h2>Trusted Partners</h2>
+
+    <div class="logo-wall">
+    <a href="https://brandnova.pythonanywhere.com/" target="_blank">
+        <img src="{% static 'codexio_main/images/partners/logo.webp' %}" alt="Brand Nova">
+    </a>
+    </div>
+</section>
 
 
 <footer>
