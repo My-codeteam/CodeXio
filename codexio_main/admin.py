@@ -7,3 +7,4 @@ from .models import *
 admin.site.register(Update)
 admin.site.register(Message)
 admin.register(Feedback)
+admin.register(SiteVisit)

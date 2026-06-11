@@ -25,6 +25,8 @@ from django.utils.timezone import now
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.db.models import F
+
 
 # Download the nltk data if not already downloaded
 nltk.download('punkt')
@@ -139,7 +141,15 @@ chatbot_pairs = [
     ],
 ]
 def home(request):
-    return render(request, 'codexio_main/index.html')
+    visit_obj, _ = SiteVisit.objects.get_or_create(id=1)
+
+    visit_obj.count = F('count') + 1
+    visit_obj.save()
+
+    visit_obj.refresh_from_db()
+    return render(request, 'codexio_main/index.html', {
+        "visits": visit_obj.count
+    })
 
 @login_required
 def feedback(request):

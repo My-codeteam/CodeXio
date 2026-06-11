@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize_numbers %}
 {% comment %} {% load socialaccount %} {% endcomment %}
 
 {% block css_files %}
@@ -15,6 +16,145 @@
 {% endblock %}
 
 {% block content %}
+<style>
+     /*Trusted Partners Section*/
+
+.partners{
+    padding: 80px 10%;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.partners h2{
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 50px;
+    color: #aaa;
+    position: relative;
+    text-align: center;
+}
+
+.partners h2::after{
+    content: "";
+    width: 80px;
+    height: 4px;
+    background: #0d6efd;
+    display: block;
+    margin: 12px auto 0;
+    border-radius: 5px;
+}
+
+ /*Logo Wall*/
+
+.logo-wall{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 30px;
+    align-items: center;
+    justify-items: center;
+}
+
+.logo-wall a{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 120px;
+    background: #111826;
+    border-radius: 12px;
+    border-shadow: 0 5px 20px rgba(0,0,0,0.15)
+}
+
+ /*Partner Logo Card*/
+
+.logo-wall a img{
+    max-height: 80px;
+    max-width: 100%;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+    padding: 10px;
+    background: transparent;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.logo-wall a img:hover{
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+ /*Responsive*/
+
+@media (max-width: 768px){
+
+    .partners{
+        padding: 60px 5%;
+    }
+
+    .partners h2{
+        font-size: 2rem;
+    }
+
+    .logo-wall{
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .logo-wall a img{
+        max-width: 120px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px){
+
+    .logo-wall{
+        grid-template-columns: 1fr 1fr;
+        margin-left: 2px;
+    }
+
+    .logo-wall a img{
+        max-width: 100px;
+        height: 70px;
+    }
+}
+
+
+.visits {
+    padding: 80px 10%;
+    text-align: center;
+    background: #0f141b;
+    margin-top: 40px;
+}
+
+.visit-box {
+    display: inline-block;
+    padding: 40px 60px;
+    border-radius: 15px;
+    background: #111826;
+    border: 1px solid #222;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+}
+
+.visit-box h3 {
+    font-size: 50px;
+    color: #ff3b3b;
+    margin: 0;
+    text-shadow: 0 0 10px rgba(255, 59, 59, 0.4);
+    transition: all 0.3s ease;
+}
+
+.visit-box p {
+    color: #bbb;
+    margin-top: 10px;
+}
+
+</style>
 
 <div class="floating-social">
 
@@ -253,6 +393,14 @@
     </div>
 </section>
 
+<section class="visits">
+    <h2>Community Growth</h2>
+
+    <div class="visit-box">
+        <h3><span id="visitCounter">{{ visits|short_number }}</span></h3>
+        <p>Total Visits to This Page</p>
+    </div>
+</section>
 
 <footer>
 
@@ -310,6 +458,43 @@
 
       menu.classList.toggle("show")
 
+    }
+
+    function animateCounter(id, target, duration = 1500) {
+        let element = document.getElementById(id);
+        let start = 0;
+        let startTime = null;
+
+        function updateCounter(currentTime) {
+            if (!startTime) startTime = currentTime;
+
+            let progress = currentTime - startTime;
+            let step = Math.min(progress / duration, 1);
+
+            let value = Math.floor(step * target);
+
+            element.innerText = value;
+
+            if (step < 1) {
+               requestAnimationFrame(updateCounter);
+            }
+        }
+
+        requestAnimationFrame(updateCounter);
+        element.innerText = formatNumber(value);
+    }
+
+    // Run animation after page loads
+    document.addEventListener("DOMContentLoaded", function () {
+       let visits = parseInt(document.getElementById("visitCounter").innerText);
+       animateCounter("visitCounter", visits);
+    });
+
+    function formatNumber(num) {
+       if (num >= 1e9) return (num / 1e9).toFixed(1).replace(".0","") + "B";
+       if (num >= 1e6) return (num / 1e6).toFixed(1).replace(".0","") + "M";
+       if (num >= 1e3) return (num / 1e3).toFixed(1).replace(".0","") + "K";
+      return num;
     }
 
     </script>

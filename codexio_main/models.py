@@ -48,3 +48,9 @@ class Feedback(models.Model):
     resolved = models.BooleanField(
         default=False
     )
+
+class SiteVisit(models.Model):
+    count = models.BigIntegerField(default=0)
+
+    def __str__(self):
+        return f"Site Visits: {self.count}"
