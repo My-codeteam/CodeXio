@@ -11,5 +11,5 @@
 <a href="#" class="{% if request.resolver_match.url_name == 'ebooks' %}active{% endif %}">Community</a>
 <a href="{% url 'my_certificates' %}" class="{% if request.resolver_match.url_name == 'my_certificates' %}active{% endif %}">Certificates</a>
 <a href="{% url 'courses:project_showcase' %}" class="{% if request.resolver_match.url_name == 'project_showcase' %}active{% endif %}">Projects</a>
-
+<a href="/feedback" target="_blank">Feedback</a>
 </div>

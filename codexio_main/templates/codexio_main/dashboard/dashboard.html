@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize_numbers %}
 
 {% block title %}
 Student Portal
@@ -418,22 +419,22 @@ transition: left 0.35s ease;
 <div class="cards">
 
 <div class="card">
-<h3>{{ total_members }}</h3>
+<h3>{{ total_members|short_number }}</h3>
 <p>Total Members</p>
 </div>
 
 <div class="card">
-<h3>{{ total_courses }}</h3>
+<h3>{{ total_courses|short_number }}</h3>
 <p>Total Courses</p>
 </div>
 
 <div class="card">
-<h3>{{ courses_enrolled }}</h3>
+<h3>{{ courses_enrolled|short_number }}</h3>
 <p>Your Enrolled Courses</p>
 </div>
 
 <div class="card">
-<h3>{{ total_repos }}</h3>
+<h3>{{ total_repos|short_number }}</h3>
 <p>Active Projects</p>
 </div>
 
@@ -484,9 +485,9 @@ transition: left 0.35s ease;
 <tr>
 <td><img src="{{ user.avatar_url }}" width="35" style="border-radius:50%;">
 {{ student.user.username }}</td>
-<td>{{ student.completed_courses }}</td>
-<td>{{ student.github_contributions }}</td>
-<td>{{ student.total_score }}</td>
+<td>{{ student.completed_courses|short_number }}</td>
+<td>{{ student.github_contributions|short_number }}</td>
+<td>{{ student.badge }}</td>
 </tr>
 
 {% empty %}

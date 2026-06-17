@@ -176,9 +176,7 @@
 
     <ul id="nav-menu">
     <li><a href="#">Home</a></li>
-    <li><a href="/about">About</a>
-    <li><a href="/feedback" target="_blank">Feedback</a></li>
-    </li>
+    <li><a href="/about">About</a></li>
     <li><a href="https://dev.to/codexmingle_community" target="_blank">Blog</a></li>
     {% if not user.is_authenticated %}
     <li>
@@ -189,6 +187,7 @@
         <a href="/student_portal" target="_blank">Dashboard</a>
     </li>
     {% endif %}
+    <li><a href="{% url 'recruit_home' %}" target="_blank">Recruit Now</a></li>
     </ul>
 
 </nav>
@@ -203,7 +202,7 @@
 
     <a href="https://www.facebook.com/groups/818235673928065/?ref=share&mibextid=NSMWBT" target="_blank" class="btn btn-primary">Join Community</a>
 
-    <a href="/coming_soon" class="btn btn-secondary">Explore Courses</a>
+    <a href="{% url 'course_list' %}" class="btn btn-secondary">Explore Courses</a>
 
     </div>
     <div class="carousel">

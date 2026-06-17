@@ -205,6 +205,8 @@ color:white;
 
                 {% endif %}
                 {% endif %}
+                {% if user.is_authenticated %}
+
                 {% if course.enrolled %}
 
                 <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">View</a>
@@ -212,6 +214,10 @@ color:white;
                 {% else %}
                 <a href="{% url 'enroll_course' course.id %}" class="btn btn-primary">Enroll now</a>
 
+                {% endif %}
+
+                {% else %}
+                <a href="/signup" class="btn btn-primary" target="_blank">Login/Signup</a>
                 {% endif %}
 
             </div>

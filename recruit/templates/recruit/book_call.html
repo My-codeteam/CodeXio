@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+<h2>Book a Call with CodexMingle</h2>
+
+<p>Selected Talent:</p>
+
+<ul>
+
+{% for student in students %}
+
+<li>{{ student.fullname }} ({{ student.username }})</li>
+
+{% endfor %}
+
+</ul>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<input class="form-control mb-2" name="name" placeholder="Your Name">
+
+<input class="form-control mb-2" name="email" placeholder="Email">
+
+<input class="form-control mb-2" name="company" placeholder="Company">
+
+<textarea class="form-control mb-2" name="message"
+placeholder="What are you looking for?"></textarea>
+
+<button class="btn btn-primary w-100">
+
+Request Interview
+
+</button>
+
+</form>
+
+</div>
+
+{% endblock %}

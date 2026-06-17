@@ -18,7 +18,7 @@ from .forms import MentorRequestForm
 from django.contrib import messages
 from django.urls import reverse
 
-@login_required
+
 def course_list(request):
 
     search = request.GET.get("search")

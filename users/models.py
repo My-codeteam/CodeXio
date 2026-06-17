@@ -123,3 +123,20 @@ class StudentReputation(models.Model):
 
     def __str__(self):
         return f"{self.user.username} Reputation"
+
+    @property
+    def badge(self):
+
+        if self.total_score >= 800:
+           return "🏆 Elite Developer"
+
+        elif self.total_score >= 500:
+           return "⭐ Expert Developer"
+
+        elif self.total_score >= 250:
+           return "🚀 Professional Developer"
+
+        elif self.total_score >= 100:
+           return "🔨 Builder"
+
+        return "🌱 Explorer"
