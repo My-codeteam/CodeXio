@@ -6,6 +6,14 @@
 
 <h2>Book a Call with CodexMingle</h2>
 
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
 <p>Selected Talent:</p>
 
 <ul>

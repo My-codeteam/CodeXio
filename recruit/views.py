@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 
 from django.conf import settings
 
+from django.contrib import messages
 
 def book_call(request):
 
@@ -47,12 +48,17 @@ Message:
             subject="New Recruitment Request - CodexMingle",
             message=full_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[settings.ADMIN_EMAIL],
+            recipient_list=[settings.DEFAULT_FROM_EMAIL],
+        )
+
+        messages.success(
+            request,
+            "Thank you! Your request has been sent. We will get back to you shortly."
         )
 
         request.session["selected_students"] = []
 
-        return redirect("recruit:recruit_home")
+        return redirect("recruit_home")
 
     return render(request, "recruit/book_call.html", {
         "students": students
@@ -173,4 +179,4 @@ def toggle_student(request, user_id):
 
     request.session["selected_students"] = selected
 
-    return redirect("recruit:recruit_home")
+    return redirect("recruit_home")

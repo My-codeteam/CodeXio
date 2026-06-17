@@ -45,7 +45,7 @@ Search
 
 <div class="col-md-4">
 
-<a href="/book-call/"
+<a href="{% url 'book_call' %}"
 class="btn btn-dark w-100">
 
 Book a Call
@@ -133,7 +133,7 @@ View Talent
 
 </a>
 
-<a href="{% url 'recruit:toggle_student' performer.user.id %}"
+<a href="{% url 'toggle_student' performer.user.id %}"
 class="btn btn-outline-success btn-sm">
 
 Select
