@@ -26,7 +26,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.db.models import F
-
+# from services.resend_service import send_email
 
 # Download the nltk data if not already downloaded
 nltk.download('punkt')
@@ -159,6 +159,20 @@ def feedback(request):
         subject = request.POST.get("subject")
 
         message = request.POST.get("message")
+
+        html_content = f"""
+<h2>New Feedback Received</h2>
+
+<p><b>From:</b> {request.user.fullname}</p>
+
+<p><b>Username:</b> {request.user.username}</p>
+
+<p><b>Email:</b> {request.user.email}</p>
+
+<hr>
+
+<p>{message}</p>
+"""
 
         send_mail(
             subject=f"[CodexMingle Feedback] {subject}",
@@ -391,8 +405,12 @@ def signup(request):
             password = request.POST.get("password", "").strip()
             fullname = request.POST.get("fullname", "").strip()
 
-            if User.objects.filter(email=email, username=username).exists():
+            if User.objects.filter(username=username).exists():
                 messages.error(request,"User already exists")
+                return redirect("login_submit")
+
+            if User.objects.filter(email=email).exists():
+                messages.error(request, "Email already exists")
                 return redirect("login_submit")
 
             if not all([
@@ -421,43 +439,43 @@ def signup(request):
                     is_active=True
                 )
 
-            verification = EmailVerification.objects.create(
-                user=user
-            )
+                verification = EmailVerification.objects.create(
+                   user=user
+                )
 
-            verification_link = request.build_absolute_uri(
-    f"/verify-email/{verification.token}/"
-)
+                verification_link = request.build_absolute_uri(
+                f"/verify-email/{verification.token}/"
+                )
 
-            subject = "Verify Your Email • CodexMingle community"
+                subject = "Verify Your Email • CodexMingle community"
 
-            html_content = render_to_string(
-               "codexio_main/emails/verify_email.html",
-               {
-                  "user": user,
-                  "verification_link": verification_link
-                }
-            )
+                html_content = render_to_string(
+                    "codexio_main/emails/verify_email.html",
+                    {
+                       "user": user,
+                       "verification_link": verification_link
+                    }
+                )
 
-            text_content = strip_tags(html_content)
+                text_content = strip_tags(html_content)
 
-            email_message = EmailMultiAlternatives(
-               subject,
-               text_content,
-               settings.DEFAULT_FROM_EMAIL,
-               [user.email]
-            )
+                email_message = EmailMultiAlternatives(
+                   subject,
+                   text_content,
+                   settings.DEFAULT_FROM_EMAIL,
+                   [user.email]
+                )
 
-            email_message.attach_alternative(html_content, "text/html")
+                email_message.attach_alternative(html_content, "text/html")
 
-            email_message.send()
+                email_message.send()
 
-            messages.success(
-               request,
-               "Account created successfully. Check your email to verify. If you do not see it in your regular mails, please check your spam folders."
-            )
+                messages.success(
+                   request,
+                   "Account created successfully. Check your email to verify. If you do not see it in your regular mails, please check your spam folders."
+                )
 
-            return redirect("/signup")
+                return redirect("/signup")
 
     return render(request, "codexio_main/signupform.html")
 
@@ -474,9 +492,10 @@ def verify_email(request, token):
     user = verification.user
 
     user.is_verified = True
-    user.save()
 
     user.verified_at = now()
+
+    user.save()
 
     messages.success(
         request,

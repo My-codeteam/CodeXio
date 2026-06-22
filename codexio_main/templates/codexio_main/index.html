@@ -396,7 +396,7 @@
     <h2>Community Growth</h2>
 
     <div class="visit-box">
-        <h3><span id="visitCounter">{{ visits|short_number }}</span></h3>
+        <h3><span id="visitCounter" data-target="{{ visits }}">0</span></h3>
         <p>Total Visits to This Page</p>
     </div>
 </section>
@@ -459,43 +459,47 @@
 
     }
 
+    function formatNumber(num) {
+       if (num >= 1e9) return (num / 1e9).toFixed(1).replace(".0", "") + "B";
+       if (num >= 1e6) return (num / 1e6).toFixed(1).replace(".0", "") + "M";
+       if (num >= 1e3) return (num / 1e3).toFixed(1).replace(".0", "") + "K";
+       return num;
+    }
+
     function animateCounter(id, target, duration = 1500) {
-        let element = document.getElementById(id);
-        let start = 0;
-        let startTime = null;
 
-        function updateCounter(currentTime) {
-            if (!startTime) startTime = currentTime;
+       let element = document.getElementById(id);
+       let startTime = null;
 
-            let progress = currentTime - startTime;
-            let step = Math.min(progress / duration, 1);
+       function updateCounter(currentTime) {
 
-            let value = Math.floor(step * target);
+           if (!startTime) startTime = currentTime;
 
-            element.innerText = value;
+           let progress = currentTime - startTime;
+           let step = Math.min(progress / duration, 1);
 
-            if (step < 1) {
-               requestAnimationFrame(updateCounter);
-            }
+           let value = Math.floor(step * target);
+
+           element.innerText = formatNumber(value);
+
+           if (step < 1) {
+              requestAnimationFrame(updateCounter);
+           }
         }
 
         requestAnimationFrame(updateCounter);
-        element.innerText = formatNumber(value);
     }
 
-    // Run animation after page loads
     document.addEventListener("DOMContentLoaded", function () {
-       let visits = parseInt(document.getElementById("visitCounter").innerText);
-       animateCounter("visitCounter", visits);
+
+        let visits = parseInt(
+          document.getElementById("visitCounter").dataset.target
+        );
+
+        animateCounter("visitCounter", visits);
+
     });
 
-    function formatNumber(num) {
-       if (num >= 1e9) return (num / 1e9).toFixed(1).replace(".0","") + "B";
-       if (num >= 1e6) return (num / 1e6).toFixed(1).replace(".0","") + "M";
-       if (num >= 1e3) return (num / 1e3).toFixed(1).replace(".0","") + "K";
-      return num;
-    }
-
-    </script>
+</script>
 
 {% endblock %}

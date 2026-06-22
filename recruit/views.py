@@ -81,6 +81,7 @@ def recruit_home(request):
     performers = (
         StudentReputation.objects
         .select_related("user")
+        .filter(user__is_verified=True)
         .order_by("-total_score")
     )
 
