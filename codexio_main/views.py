@@ -147,9 +147,43 @@ def home(request):
     visit_obj.save()
 
     visit_obj.refresh_from_db()
+
+    testimonials = Testimonial.objects.filter(
+    approved=True)[:6]
     return render(request, 'codexio_main/index.html', {
-        "visits": visit_obj.count
+        "visits": visit_obj.count, "testimonials": testimonials
     })
+
+
+def testimonial(request):
+
+    if request.method == "POST":
+
+        Testimonial.objects.create(
+
+            name=request.POST["name"],
+
+            email=request.POST.get("email"),
+
+            country=request.POST["country"],
+
+            rating=request.POST.get("rating", 5),
+
+            comment=request.POST["comment"]
+
+        )
+
+        messages.success(
+            request,
+            "Thank you! Your review has been submitted and will appear after approval. Please kindly be patient."
+        )
+
+        return redirect("/testimonial")
+
+    return render(
+        request,
+        "codexio_main/testimonial.html"
+    )
 
 @login_required
 def feedback(request):

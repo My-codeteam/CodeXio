@@ -154,6 +154,57 @@
     margin-top: 10px;
 }
 
+.testimonials{
+   padding:80px 10%;
+   background:#111826;
+   text-align:center;
+}
+
+.testimonials h2{
+   font-size:2.5rem;
+   margin-bottom:50px;
+}
+
+.testimonial-grid{
+   display:grid;
+   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+   gap:25px;
+}
+
+.testimonial-card{
+   background:#0f141b;
+   padding:25px;
+   border-radius:12px;
+   border:1px solid #222;
+   transition:.3s;
+}
+
+.testimonial-card:hover{
+   transform:translateY(-6px);
+}
+
+.stars{
+   font-size:22px;
+   color:#facc15;
+   margin-bottom:15px;
+}
+
+.comment{
+   font-style:italic;
+   color:#ddd;
+   margin-bottom:20px;
+   line-height:1.7;
+}
+
+.testimonial-card h4{
+   margin:0;
+   color:#fff;
+}
+
+.testimonial-card small{
+   color:#aaa;
+}
+
 </style>
 
 <div class="floating-social">
@@ -378,6 +429,64 @@
              <a href="https://www.linkedin.com/in/petercontent?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fab fa-linkedin"></i></a>
             </div>
         </div>
+    </div>
+
+</section>
+
+<section class="testimonials">
+
+    <h2>What Our Community Says</h2>
+
+    <div class="testimonial-grid">
+
+       {% for review in testimonials %}
+
+       <div class="testimonial-card">
+
+           <div class="stars">
+
+           {% for i in "12345" %}
+
+           {% if forloop.counter <= review.rating %}
+           ★
+           {% else %}
+           ☆
+           {% endif %}
+
+           {% endfor %}
+
+           </div>
+
+           <p class="comment">
+
+           "{{ review.comment }}"
+
+           </p>
+
+           <h4>{{ review.name }}</h4>
+
+           <small>{{ review.country }}</small>
+
+        </div>
+
+        {% empty %}
+
+        <p>
+           Be the first person to leave a review.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+    <div style="margin-top:40px;text-align:center;">
+
+    <a href="{% url 'courses:testimonial' %}" class="btn btn-primary">
+
+       Leave a Review
+
+    </a>
+
     </div>
 
 </section>

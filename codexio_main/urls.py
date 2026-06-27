@@ -28,5 +28,6 @@ urlpatterns = [
     "feedback/",
     views.feedback,
     name="feedback"
-    )
+    ),
+    path('testimonial', views.testimonial, name='testimonial')
 ]
