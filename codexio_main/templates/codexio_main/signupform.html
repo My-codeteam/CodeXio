@@ -217,11 +217,12 @@
         {% csrf_token %}
 
         <input type="text" name="username" placeholder="Username (preferrably you github username)" required>
-        <input type="text" name="fullname" placeholder="Real Fullname" required>
+        <input type="text" name="fullname" placeholder="Real Full Name" required>
         <input type="email" name="email" placeholder="Github Email preferrably" required>
         <input type="text" name="phone" placeholder="Phone" required>
         <input type="text" name="country" placeholder="Country" required>
         <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
 
         <button type="submit" name="signup_submit">Register</button>
        </form>

@@ -26,6 +26,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.db.models import F
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 # from services.resend_service import send_email
 
 # Download the nltk data if not already downloaded
@@ -437,6 +439,7 @@ def signup(request):
             phone = request.POST.get("phone", "").strip()
             country = request.POST.get("country", "").strip()
             password = request.POST.get("password", "").strip()
+            confirm_password = request.POST.get("confirm_password", "").strip()
             fullname = request.POST.get("fullname", "").strip()
 
             if User.objects.filter(username=username).exists():
@@ -447,13 +450,26 @@ def signup(request):
                 messages.error(request, "Email already exists")
                 return redirect("login_submit")
 
+            if password != confirm_password:
+              messages.error(
+                request,
+                "Passwords do not match."
+              )
+
+            try:
+               validate_password(password)
+            except ValidationError as e:
+                for error in e.messages:
+                   messages.error(request, error)
+
             if not all([
                 username,
                 email,
                 phone,
                 country,
                 password,
-                fullname
+                fullname,
+                confirm_password
             ]):
 
                messages.error(
