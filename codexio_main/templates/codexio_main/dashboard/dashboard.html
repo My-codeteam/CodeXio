@@ -483,7 +483,11 @@ transition: left 0.35s ease;
 
 {% for student in top_students %}
 <tr>
-<td><img src="{{ user.avatar_url }}" width="35" style="border-radius:50%;">
+<td>{% if student.user.profile_image %}
+    <img src="{{ student.user.profile_image.url }}" width="35" style="border-radius:50%;">
+{% else %}
+    <img src="{% static 'images/default-avatar.png' %}" width="35" style="border-radius:50%;">
+{% endif %}
 {{ student.user.username }}</td>
 <td>{{ student.completed_courses|short_number }}</td>
 <td>{{ student.github_contributions|short_number }}</td>
@@ -531,10 +535,30 @@ You can ask:
 • How to get certificates
 • How to join community
 <p>
-{% if update == null %}
-And I alert you on any updates to the site
+{% if updates %}
+
+<b>Nexora:</b>
+
+<p>
+I've got some new announcements for you 👇
+</p>
+
+{% for update in updates|slice:":3" %}
+
+<div style="background:#1b2430;padding:10px;margin:10px 0;border-radius:8px;">
+
+<p>{{ update.message }}</p>
+
+</div>
+
+{% endfor %}
+
 {% else %}
-{{ updates }}
+
+<p>
+There are currently no new announcements.
+</p>
+
 {% endif %}
 </p>
 

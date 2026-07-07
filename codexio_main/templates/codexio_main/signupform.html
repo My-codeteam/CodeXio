@@ -204,7 +204,7 @@
       <form method="POST">
         {% csrf_token %}
 
-        <input type="text" name="username" placeholder="Username">
+        <input type="text" name="username" placeholder="Username" value="{{ data.username|default:'' }}">
         <input type="password" name="password" placeholder="Password">
 
         <button type="submit" name="login_submit">Login</button>
@@ -216,11 +216,11 @@
       <form method="POST">
         {% csrf_token %}
 
-        <input type="text" name="username" placeholder="Username (preferrably you github username)" required>
-        <input type="text" name="fullname" placeholder="Real Full Name" required>
-        <input type="email" name="email" placeholder="Github Email preferrably" required>
-        <input type="text" name="phone" placeholder="Phone" required>
-        <input type="text" name="country" placeholder="Country" required>
+        <input type="text" name="username" placeholder="Username (preferrably you github username)" value="{{ data.username|default:'' }}" required>
+        <input type="text" name="fullname" placeholder="Real Full Name" value="{{ data.fullname|default:'' }}" required>
+        <input type="email" name="email" placeholder="Github Email preferrably" value="{{ data.email|default:'' }}" required>
+        <input type="text" name="phone" placeholder="Phone" value="{{ data.phone|default:'' }}" required>
+        <input type="text" name="country" placeholder="Country" value="{{ data.country|default:'' }}" required>
         <input type="password" name="password" placeholder="Password" required>
         <input type="password" name="confirm_password" placeholder="Confirm Password" required>
 
@@ -244,6 +244,93 @@
       document.getElementById('register-form').classList.remove('hidden');
       document.getElementById('login-form').classList.add('hidden');
     }
+
+    window.onload = function () {
+
+      {% if form_type == "register" %}
+        showRegister();
+      {% else %}
+        showLogin();
+      {% endif %}
+    };
+
+    /* const registerForm = document.getElementById("register-form");
+
+    registerForm.addEventListener("submit", function(e){
+
+        e.preventDefault();
+
+        fetch("",{
+          method:"POST",
+          body:new FormData(this),
+          headers:{
+            "X-Requested-With":"XMLHttpRequest"
+          }
+        })
+
+       .then(res=>res.json())
+
+       .then(data=>{
+
+          if(data.status==="success"){
+
+            alert(data.message);
+
+            if(data.redirect){
+                window.location.href=data.redirect;
+            }
+
+          }
+          else{
+
+            alert(data.message);
+
+          }
+
+        });
+
+    });
+    const loginForm = document.getElementById("login-form");
+
+    loginForm.addEventListener("submit", function(e){
+
+        e.preventDefault();
+
+        fetch("",{
+          method:"POST",
+          body:new FormData(this),
+          headers:{
+            "X-Requested-With":"XMLHttpRequest"
+          }
+        })
+
+        .then(res=>res.json())
+
+        .then(data=>{
+
+           if(data.status==="success"){
+
+              alert(data.message);
+
+               window.location.href = data.redirect;
+
+            }else{
+
+               alert(data.message);
+
+            }
+
+        })
+
+        .catch(error=>{
+
+           console.error(error);
+
+           alert("Something went wrong.");
+
+        });
+
+    });*/
     // Disable all form buttons
     /* document.querySelectorAll('.form-box button').forEach(btn => {
       btn.disabled = true;
