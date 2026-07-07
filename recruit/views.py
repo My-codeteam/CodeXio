@@ -82,6 +82,7 @@ def recruit_home(request):
         StudentReputation.objects
         .select_related("user")
         .filter(user__is_verified=True)
+        .exclude(user__profile_image="")
         .order_by("-total_score")
     )
 

@@ -26,6 +26,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.db.models import F
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 # from services.resend_service import send_email
 
 # Download the nltk data if not already downloaded
@@ -331,6 +333,10 @@ def student_portal(request):
 
     courses = Course.objects.order_by("-id")[:6]
 
+    UpdateNotification.objects.filter(
+        created_at__lt=timezone.now() - timedelta(days=5)
+    ).delete()
+
     updates = UpdateNotification.objects.all()
 
 
@@ -393,125 +399,219 @@ def student_portal(request):
 
 def signup(request):
 
+    context = {
+        "form_type": "login",
+        "data": {}
+    }
+
     if request.method == "POST":
+
+        context["data"] = request.POST
 
         # LOGIN
         if "login_submit" in request.POST:
 
-            username = request.POST.get("username")
-            password = request.POST.get("password")
+            context["form_type"] = "login"
 
-            user = authenticate(request, username=username, password=password)
+            username = request.POST.get("username", "").strip()
+            password = request.POST.get("password", "").strip()
 
-            if user is not None:
-
-                if not user.is_verified:
-
-                    messages.error(
-                        request,
-                        "Please verify your email first."
-                    )
-
-                    return redirect("/signup")
-
-                login(request, user)
-
-                if user.is_staff or user.is_superuser:
-                    return redirect("courses:admin_dashboard")
-
-                return redirect("/student_portal")
-
-            else:
+            if not username or not password:
 
                 messages.error(
                     request,
-                    "Invalid username or password"
+                    "Username and password are required."
                 )
 
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            user = authenticate(
+                request,
+                username=username,
+                password=password
+            )
+
+            if user is None:
+
+                messages.error(
+                    request,
+                    "Invalid username or password."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            if not user.is_verified:
+
+                messages.error(
+                    request,
+                    "Please verify your email before logging in."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            login(request, user)
+
+            if user.is_staff or user.is_superuser:
+                return redirect("courses:admin_dashboard")
+
+            return redirect("/student_portal")
 
         # REGISTER
-        if "signup_submit" in request.POST:
+        elif "signup_submit" in request.POST:
+
+            context["form_type"] = "register"
 
             username = request.POST.get("username", "").strip()
+            fullname = request.POST.get("fullname", "").strip()
             email = request.POST.get("email", "").strip()
             phone = request.POST.get("phone", "").strip()
             country = request.POST.get("country", "").strip()
-            password = request.POST.get("password", "").strip()
-            fullname = request.POST.get("fullname", "").strip()
-
-            if User.objects.filter(username=username).exists():
-                messages.error(request,"User already exists")
-                return redirect("login_submit")
-
-            if User.objects.filter(email=email).exists():
-                messages.error(request, "Email already exists")
-                return redirect("login_submit")
+            password = request.POST.get("password", "")
+            confirm_password = request.POST.get("confirm_password", "")
 
             if not all([
                 username,
+                fullname,
                 email,
                 phone,
                 country,
                 password,
-                fullname
+                confirm_password
             ]):
 
-               messages.error(
-                  request,
-                  "All fields are required."
-               )
-
-            else:
-
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    phone=phone,
-                    country=country,
-                    fullname=fullname,
-                    is_active=True
+                messages.error(
+                    request,
+                    "All fields are required."
                 )
 
-                verification = EmailVerification.objects.create(
-                   user=user
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
                 )
 
-                verification_link = request.build_absolute_uri(
+            if User.objects.filter(username=username).exists():
+
+                messages.error(
+                    request,
+                    "Username already exists."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            if User.objects.filter(email=email).exists():
+
+                messages.error(
+                    request,
+                    "Email already exists."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            if password != confirm_password:
+
+                messages.error(
+                    request,
+                    "Passwords do not match."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            try:
+
+                validate_password(password)
+
+            except ValidationError as e:
+
+                for error in e.messages:
+                    messages.error(request, error)
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            user = User.objects.create_user(
+                username=username,
+                fullname=fullname,
+                email=email,
+                phone=phone,
+                country=country,
+                password=password,
+                is_active=True
+            )
+
+            verification = EmailVerification.objects.create(
+                user=user
+            )
+
+            verification_link = request.build_absolute_uri(
                 f"/verify-email/{verification.token}/"
-                )
+            )
 
-                subject = "Verify Your Email • CodexMingle community"
+            subject = "Verify Your Email • CodexMingle"
 
-                html_content = render_to_string(
-                    "codexio_main/emails/verify_email.html",
-                    {
-                       "user": user,
-                       "verification_link": verification_link
-                    }
-                )
+            html_content = render_to_string(
+                "codexio_main/emails/verify_email.html",
+                {
+                    "user": user,
+                    "verification_link": verification_link
+                }
+            )
 
-                text_content = strip_tags(html_content)
+            text_content = strip_tags(html_content)
 
-                email_message = EmailMultiAlternatives(
-                   subject,
-                   text_content,
-                   settings.DEFAULT_FROM_EMAIL,
-                   [user.email]
-                )
+            email = EmailMultiAlternatives(
+                subject,
+                text_content,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email]
+            )
 
-                email_message.attach_alternative(html_content, "text/html")
+            email.attach_alternative(
+                html_content,
+                "text/html"
+            )
 
-                email_message.send()
+            email.send()
 
-                messages.success(
-                   request,
-                   "Account created successfully. Check your email to verify. If you do not see it in your regular mails, please check your spam folders."
-                )
+            messages.success(
+                request,
+                "Account created successfully. Check your email to verify. If you do not see it in your regular mails, please check your spam folders."
+            )
 
-                return redirect("/signup")
+            return redirect("/signup")
 
-    return render(request, "codexio_main/signupform.html")
+    return render(
+        request,
+        "codexio_main/signupform.html",
+        context
+    )
 
 def verify_email(request, token):
 
