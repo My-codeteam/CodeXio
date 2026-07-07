@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Student Portal | Certificate
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.certificate-container{
+    max-width:1100px;
+    margin:auto;
+    padding:40px 20px;
+    color:white;
+}
+
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:15px;
+    margin-bottom:30px;
+}
+
+.back-btn{
+    background:#111826;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:8px;
+    border:1px solid #1f2933;
+    transition:0.3s;
+}
+
+.back-btn:hover{
+    background:#ff3b3b;
+}
+
+.download-btn{
+    background:#ff3b3b;
+    color:white;
+    text-decoration:none;
+    padding:12px 20px;
+    border-radius:8px;
+    display:inline-block;
+    margin-top:20px;
+    transition:0.3s;
+}
+
+.download-btn:hover{
+    background:#e52e2e;
+}
+
+.certificate-card{
+    background:#111826;
+    border:1px solid #1f2933;
+    border-radius:16px;
+    padding:40px;
+    text-align:center;
+    overflow:hidden;
+}
+
+.certificate-card img{
+    width:100%;
+    border-radius:12px;
+}
+
+.cert-title{
+    font-size:42px;
+    margin-bottom:20px;
+    color:#ff3b3b;
+}
+
+.cert-student{
+    font-size:38px;
+    margin:20px 0;
+    font-weight:700;
+}
+
+.cert-course{
+    font-size:28px;
+    color:#4da6ff;
+    margin:20px 0;
+}
+
+.cert-info{
+    margin-top:15px;
+    font-size:17px;
+    color:#d1d5db;
+}
+
+.cert-id{
+    margin-top:25px;
+    color:#22c55e;
+    font-weight:700;
+    word-break:break-word;
+}
+
+@media(max-width:768px){
+
+    .certificate-card{
+        padding:25px 18px;
+    }
+
+    .cert-title{
+        font-size:28px;
+    }
+
+    .cert-student{
+        font-size:26px;
+    }
+
+    .cert-course{
+        font-size:22px;
+    }
+
+    .cert-info{
+        font-size:15px;
+    }
+}
+
+</style>
+
+<div class="certificate-container">
+
+    <div class="top-bar">
+
+        <a href="{% url 'courses:student_portal' %}" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+            Dashboard
+        </a>
+
+        {% if certificate.certificate_template %}
+
+        <a
+        href="{% url 'download_certificate' certificate.certificate_id %}"
+        class="download-btn"
+        >
+            <i class="fa-solid fa-download"></i>
+            Download Certificate
+        </a>
+
+        {% endif %}
+
+    </div>
+
+    <div class="certificate-card">
+
+        {% if certificate.certificate_template %}
+
+            <img
+            src="{{ certificate.certificate_template.url }}"
+            alt="Certificate"
+            >
+
+        {% else %}
+
+            <h1 class="cert-title">
+                Certificate of Completion
+            </h1>
+
+            <p>This certifies that</p>
+
+            <h2 class="cert-student">
+                {{ certificate.student.fullname }}
+            </h2>
+
+            <p>has successfully completed the course</p>
+
+            <h3 class="cert-course">
+                {{ certificate.course.title }}
+            </h3>
+
+            <p class="cert-info">
+                Issued by CodexMingle
+            </p>
+
+            <p class="cert-info">
+                Date:
+                {{ certificate.issued_date|date:"F Y" }}
+            </p>
+
+            <p class="cert-id">
+                Certificate ID:
+                {{ certificate.certificate_id }}
+            </p>
+
+            <p>
+              Verify Online:
+              <a href="{{ verification_url }}">
+                  {{ verification_url }}
+              </a>
+            </p>
+
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

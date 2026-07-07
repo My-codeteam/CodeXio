@@ -19,8 +19,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("codexio_main.urls")), #http://localhost:8000/
+    path('courses/', include('courses.urls')),
+    path('payments/', include('payments.urls')),
+    path("users/", include("users.urls")),
+    path("recruit/", include("recruit.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

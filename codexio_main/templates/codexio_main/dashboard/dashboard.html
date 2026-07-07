@@ -1,0 +1,638 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize_numbers %}
+
+{% block title %}
+Student Portal
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* GENERAL */
+
+body{
+margin:0;
+font-family:Segoe UI;
+background:#0c1117;
+color:white;
+}
+
+
+/* MENU BUTTON */
+
+.menu-btn{
+display:none;
+font-size:24px;
+cursor:pointer;
+color:white;
+}
+
+
+/* SIDEBAR */
+
+.sidebar{
+width:230px;
+height:100vh;
+position:fixed;
+background:#0f141b;
+padding-top:30px;
+left:0;
+transition:0.3s;
+}
+
+.sidebar h2{
+text-align:center;
+color:#ff3b3b;
+margin-bottom:40px;
+}
+
+.sidebar a{
+display:block;
+padding:15px 25px;
+color:#bbb;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#1b2430;
+color:white;
+}
+
+
+/* MAIN */
+
+.main{
+margin-left:230px;
+padding:30px 40px;
+transition:0.3s;
+}
+
+
+/* HEADER */
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+}
+
+.profile{
+width:40px;
+height:40px;
+border-radius:50%;
+background:#ff3b3b;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+}
+
+
+/* CARDS */
+
+.cards{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:40px;
+}
+
+.card{
+background:#111826;
+padding:25px;
+border-radius:10px;
+border:1px solid #1f2933;
+}
+
+.card h3{
+margin:0;
+font-size:30px;
+color:#ff3b3b;
+}
+
+.card p{
+color:#aaa;
+}
+
+
+/* COURSE GRID */
+
+.section{
+margin-top:40px;
+}
+
+.section h2{
+margin-bottom:20px;
+}
+
+.course-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+gap:20px;
+}
+
+.course-card{
+background:#111826;
+padding:20px;
+border-radius:10px;
+border:1px solid #1f2933;
+}
+
+.course-card h4{
+margin:10px 0;
+}
+
+
+/* TABLE */
+
+table{
+width:100%;
+border-collapse:collapse;
+background:#111826;
+border-radius:10px;
+overflow:hidden;
+}
+
+th,td{
+padding:15px;
+text-align:left;
+}
+
+th{
+background:#1b2430;
+}
+
+tr{
+border-bottom:1px solid #222;
+}
+
+
+/* CHATBOT */
+
+.chatbot{
+position:fixed;
+bottom:20px;
+right:20px;
+z-index:1000;
+}
+
+.chatbot-btn{
+background:#ff3b3b;
+width:60px;
+height:60px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+cursor:pointer;
+}
+
+.chat-window{
+position:absolute;
+bottom:80px;
+right:0;
+width:300px;
+background:#111826;
+border-radius:10px;
+display:none;
+flex-direction:column;
+border:1px solid #333;
+}
+
+.chat-header{
+background:#ff3b3b;
+padding:10px;
+border-radius:10px 10px 0 0;
+}
+
+.chat-body{
+padding:15px;
+height:220px;
+overflow-y:auto;
+font-size:14px;
+}
+
+.chat-input{
+display:flex;
+border-top:1px solid #333;
+}
+
+.chat-input input{
+flex:1;
+padding:10px;
+border:none;
+background:#0c1117;
+color:white;
+}
+
+.chat-input button{
+background:#ff3b3b;
+border:none;
+color:white;
+padding:10px 15px;
+}
+
+
+/* MOBILE RESPONSIVE */
+
+@media (max-width:900px){
+
+.sidebar{
+left:-230px;
+}
+
+.sidebar.active{
+left:0;
+width:100%;
+height:100%;
+z-index:999;
+}
+
+.main{
+margin-left:0;
+padding:20px;
+}
+
+.menu-btn{
+display:block;
+z-index: 3000;
+}
+
+.cards{
+grid-template-columns:1fr;
+}
+
+.course-grid{
+grid-template-columns:1fr;
+}
+
+table{
+font-size:14px;
+}
+
+}
+
+.profile-wrapper{
+position:relative;
+cursor:pointer;
+}
+
+.avatar{
+width:40px;
+height:40px;
+border-radius:50%;
+object-fit:cover;
+}
+
+.avatar-lg{
+width:70px;
+height:70px;
+border-radius:50%;
+object-fit:cover;
+margin-bottom:10px;
+}
+
+.profile-dropdown{
+position:absolute;
+right:0;
+top:55px;
+background:#111826;
+width:220px;
+border-radius:10px;
+border:1px solid #333;
+display:none;
+flex-direction:column;
+z-index:2000;
+}
+
+.profile-dropdown a{
+padding:12px 15px;
+text-decoration:none;
+color:#ddd;
+display:block;
+}
+
+.profile-dropdown a:hover{
+background:#1b2430;
+}
+
+.profile-header{
+text-align:center;
+padding:15px;
+border-bottom:1px solid #333;
+}
+
+.danger{
+color:#ff4d4d;
+}
+
+.sidebar a.active{
+background:#1b2430;
+color:white;
+border-left:4px solid #ff3b3b;
+}
+
+.sidebar{
+transition: left 0.35s ease;
+}
+
+</style>
+
+
+
+<!-- SIDEBAR -->
+
+{% include "components/sidebar.html" %}
+
+<!-- MAIN CONTENT -->
+
+<div class="main">
+
+<div class="header">
+
+<div class="menu-btn" onclick="toggleMenu()">
+<i class="fa-solid fa-bars"></i>
+</div>
+
+<h1>Dashboard</h1>
+
+<div class="profile-wrapper">
+
+<div class="profile" onclick="toggleProfile()">
+
+{% if request.user.profile_image %}
+<img src="{{ request.user.profile_image.url }}" class="avatar">
+{% else %}
+{{ request.user.username|first|upper }}
+{% endif %}
+
+</div>
+
+<div class="profile-dropdown" id="profileDropdown">
+
+<div class="profile-header">
+
+{% if request.user.profile_image %}
+<img src="{{ request.user.profile_image.url }}" class="avatar-lg">
+{% endif %}
+
+<p>{{ request.user.username }}</p>
+<p>{{ request.user.email }}</p>
+<p>{{ request.user.fullname }}</p>
+<p>{{ request.user.country }}</p>
+<p>{{ request.user.phone }}</p>
+<small>{{ request.user.student_id }}</small>
+
+</div>
+
+<a href="{% url 'users:edit_profile' %}">
+<i class="fa-solid fa-user"></i> Edit Profile
+</a>
+
+<a href="{% url 'users:delete_account' %}" class="danger">
+<i class="fa-solid fa-trash"></i> Delete Account
+</a>
+
+<form action="{% url 'users:logout' %}" method="POST">
+{% csrf_token %}
+<i class="fa-solid fa-right-from-bracket"><button type="submit">Logout</button></i>
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- STATS -->
+
+<div class="cards">
+
+<div class="card">
+<h3>{{ total_members|short_number }}</h3>
+<p>Total Members</p>
+</div>
+
+<div class="card">
+<h3>{{ total_courses|short_number }}</h3>
+<p>Total Courses</p>
+</div>
+
+<div class="card">
+<h3>{{ courses_enrolled|short_number }}</h3>
+<p>Your Enrolled Courses</p>
+</div>
+
+<div class="card">
+<h3>{{ total_repos|short_number }}</h3>
+<p>Active Projects</p>
+</div>
+
+</div>
+
+
+
+<!-- RECENT COURSES -->
+
+<div class="section">
+
+<h2>Recent Courses</h2>
+
+<div class="course-grid">
+
+{% for course in courses %}
+<div class="course-card">
+<h4>{{ course.title }}</h4>
+<p>{{ course.description|truncatewords:20 }}</p>
+</div>
+{% endfor %}
+
+
+</div>
+
+
+
+<!-- TOP STUDENTS -->
+
+<div class="section">
+
+<h2>Top Performing Students</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Student</th>
+<th>Courses Completed</th>
+<th>Contributions</th>
+<th>Rank</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for student in top_students %}
+<tr>
+<td><img src="{{ user.avatar_url }}" width="35" style="border-radius:50%;">
+{{ student.user.username }}</td>
+<td>{{ student.completed_courses|short_number }}</td>
+<td>{{ student.github_contributions|short_number }}</td>
+<td>{{ student.badge }}</td>
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="4">No contributors yet</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+<!-- CHATBOT -->
+
+<div class="chatbot">
+
+<div class="chat-window" id="chatWindow">
+
+<div class="chat-header">
+Nexora Assistant
+</div>
+
+<div class="chat-body" id="chatBody">
+
+Hello 👋
+I'm Nexora, your CodexMingle assistant.
+
+You can ask:
+
+• Where are my courses
+• How to submit assignments
+• Where are ebooks
+• How to get certificates
+• How to join community
+<p>
+{% if update == null %}
+And I alert you on any updates to the site
+{% else %}
+{{ updates }}
+{% endif %}
+</p>
+
+</div>
+
+<div class="chat-input">
+
+<input type="text" id="userInput" placeholder="Ask Nexora...">
+
+<button onclick="sendMessage()">Send</button>
+
+</div>
+
+</div>
+
+<div class="chatbot-btn" onclick="toggleChat()">
+<i class="fa-solid fa-robot"></i>
+</div>
+
+</div>
+
+
+
+<script>
+
+/* MOBILE MENU */
+
+function toggleMenu(){
+let sidebar=document.getElementById("sidebar")
+sidebar.classList.toggle("active")
+}
+
+
+/* CHAT */
+
+function toggleChat(){
+let chat=document.getElementById("chatWindow")
+chat.style.display = chat.style.display==="flex" ? "none" : "flex"
+}
+
+
+/* CHATBOT RESPONSES */
+
+function sendMessage(){
+
+let input=document.getElementById("userInput")
+let chat=document.getElementById("chatBody")
+
+let userText=input.value.toLowerCase()
+
+chat.innerHTML += "<br><b>You:</b> "+userText
+
+
+let botReply="I'm not sure yet. Try asking about courses, assignments, certificates, ebooks, or community."
+
+if(userText.includes("hi")){
+    botReply= "Hello there. I am Nexora AI, Codexmingle's assist bot design to guide you through the website. I might not be able to answer all of your questions, which is why your feedback through email is invaluable. Just type help if you do not know what I can answer."
+}
+
+if(userText.includes("course")){
+botReply="You can view your courses in the Courses section on the sidebar."
+}
+
+else if(userText.includes("assignment")){
+botReply="To submit assignments, go to the course module page and upload your a link to your solution. Submits are only allowed in live cohort classes."
+}
+
+else if(userText.includes("certificate")){
+botReply="Certificates appear after completing a course. Check the Certificates section."
+}
+
+else if(userText.includes("ebook") || userText.includes("book")){
+botReply="Learning materials can be downloaded through the Ebook link in the navigation menu."
+}
+
+else if(userText.includes("community")){
+botReply="You can join CodexMingle's learning community through the Community link in the navigation."
+}
+
+else if(userText.includes("help")){
+botReply="I can help with courses, assignments, ebooks, certificates, and community."
+}
+
+
+chat.innerHTML += "<br><b>Nexora:</b> "+botReply+"<br>"
+
+input.value=""
+
+}
+
+function toggleProfile(){
+
+let menu = document.getElementById("profileDropdown")
+
+menu.style.display = menu.style.display === "block" ? "none" : "block"
+
+}
+
+</script>
+
+{% endblock %}

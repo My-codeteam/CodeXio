@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    CodexMingle|Course|enroll
+{% endblock %}
+{% block content %}
+<h2>{{ course.title }}</h2>
+
+<p>Price: ₦{{ course.price }}</p>
+
+<h3>Bank Transfer Details</h3>
+
+<p>
+Bank: Opay<br>
+Account Name: CodexMingle<br>
+Account Number: XXXXXXXX
+</p>
+
+<p>After transfer, upload your receipt.</p>
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+
+{{ form.as_p }}
+
+<button type="submit">Submit Payment Proof</button>
+
+</form>
+{% endblock %}

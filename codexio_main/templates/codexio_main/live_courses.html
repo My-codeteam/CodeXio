@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+
+{% block title %}Live Cohorts{% endblock%}
+{% block content %}
+<style>
+
+body{
+font-family: Arial;
+background:#0f172a;
+color:white;
+margin:0;
+}
+
+/* MENU BUTTON (HAMBURGER) */
+
+.menu-btn{
+display:none;
+font-size:24px;
+cursor:pointer;
+color:white;
+z-index:3000;
+}
+
+
+/* SIDEBAR NAVIGATION */
+
+.sidebar{
+width:230px;
+height:100vh;
+position:fixed;
+background:#0f141b;
+padding-top:30px;
+left:0;
+transition:0.3s;
+}
+
+.main{
+margin-left:230px;
+padding:30px 40px;
+transition:0.3s;
+}
+
+/* SIDEBAR TITLE */
+
+.sidebar h2{
+text-align:center;
+color:#ff3b3b;
+margin-bottom:40px;
+}
+
+
+/* NAVIGATION LINKS */
+
+.sidebar a{
+display:block;
+padding:15px 25px;
+color:#bbb;
+text-decoration:none;
+}
+
+
+/* NAV HOVER */
+
+.sidebar a:hover{
+background:#1b2430;
+color:white;
+}
+
+
+/* ACTIVE PAGE */
+
+.sidebar a.active{
+background:#1b2430;
+color:white;
+border-left:4px solid #ff3b3b;
+}
+
+
+/* MOBILE RESPONSIVE NAVIGATION */
+
+@media (max-width:900px){
+
+.sidebar{
+left:-230px;
+}
+
+.main{
+margin-left:0;
+padding:20px;
+}
+
+.sidebar.active{
+left:0;
+width:100%;
+height:100%;
+z-index:999;
+}
+
+.menu-btn{
+display:block;
+z-index: 7000;
+position: relative;
+}
+
+}
+
+.sidebar{
+transition: left 0.35s ease;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+padding:40px 20px;
+}
+
+.section{
+margin-bottom:50px;
+}
+
+.course-card{
+background:#111826;
+border:1px solid #1f2933;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+.enroll-btn{
+margin-top:15px;
+padding:10px 20px;
+background:#ff3b3b;
+border:none;
+border-radius:6px;
+color:white;
+cursor:pointer;
+}
+
+.disabled{
+background:#444;
+cursor:not-allowed;
+}
+
+</style>
+
+{% include "components/sidebar.html" %}
+
+
+<!-- MAIN CONTENT -->
+
+<div class="main">
+
+<div class="header">
+
+<div class="menu-btn" onclick="toggleMenu()">
+<i class="fa-solid fa-bars"></i>
+</div>
+
+
+<h1>Live Cohorts</h1>
+
+<!-- UPCOMING COHORTS -->
+
+<div class="section">
+
+<h2>Upcoming Cohorts</h2>
+
+{% if upcoming_courses %}
+
+{% for course in upcoming_courses %}
+
+<div class="course-card">
+
+<h3>{{course.title}}</h3>
+
+<p>{{course.description}}</p>
+
+<p>
+Enrollment Opens: {{course.enrollment_open}}
+</p>
+
+<div id="countdown-{{course.id}}"></div>
+
+<button
+class="enroll-btn disabled"
+id="btn-{{course.id}}">
+Enroll Now
+</button>
+
+</div>
+
+<script>
+
+var countDownDate = new Date("{{course.enrollment_open|date:'c'}}").getTime();
+
+var x = setInterval(function(){
+
+var now = new Date().getTime();
+
+var distance = countDownDate - now;
+
+var hours = Math.floor((distance % (1000*60*60*24))/(1000*60*60));
+var minutes = Math.floor((distance % (1000*60*60))/(1000*60));
+var seconds = Math.floor((distance % (1000*60))/1000);
+
+document.getElementById("countdown-{{course.id}}").innerHTML =
+hours+"h "+minutes+"m "+seconds+"s ";
+
+if(distance < 0){
+
+clearInterval(x);
+
+document.getElementById("countdown-{{course.id}}").innerHTML = "Enrollment Open";
+
+var btn = document.getElementById("btn-{{course.id}}");
+
+btn.classList.remove("disabled");
+
+}
+
+},1000);
+
+</script>
+
+{% endfor %}
+
+{% else %}
+
+<p>No upcoming live cohorts.</p>
+
+{% endif %}
+
+</div>
+
+<h2>Enrollment Open</h2>
+
+{% for course in open_courses %}
+
+<div class="course-card">
+
+<h3>{{ course.title }}</h3>
+<p>{{ course.description }}</p>
+
+<a href="{% url 'enroll_course' course.id %}">
+<button class="enroll-btn">Enroll Now</button>
+</a>
+
+</div>
+
+{% endfor %}
+
+---
+
+<!-- ENROLLED COHORTS -->
+
+<div class="section">
+
+<h2>Your Live Cohorts</h2>
+
+{% if enrolled_courses %}
+
+{% for course in enrolled_courses %}
+
+<div class="course-card">
+
+<h3>{{course.title}}</h3>
+
+<p>{{course.description}}</p>
+
+<a href="{% url 'course_detail' course.id %}">
+Go to Course
+</a>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<p>You are not enrolled in any live cohort.</p>
+
+{% endif %}
+
+</div>
+
+
+<script>
+    function toggleMenu(){
+       let sidebar = document.getElementById("sidebar")
+       sidebar.classList.toggle("active")
+    }
+</script>
+
+</div>
+</div>
+
+{% endblock %}

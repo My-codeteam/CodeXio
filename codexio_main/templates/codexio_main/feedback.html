@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+<h2>Send Feedback</h2>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>Subject</label>
+
+<input
+type="text"
+name="subject"
+required
+>
+
+<label>Message</label>
+
+<textarea
+name="message"
+rows="8"
+required
+></textarea>
+
+<button type="submit">
+Send Feedback
+</button>
+
+</form>
+
+</div>
+
+<style>
+
+.container{
+max-width:700px;
+margin:auto;
+padding:40px;
+}
+
+input,
+textarea{
+width:100%;
+padding:12px;
+margin-top:8px;
+margin-bottom:20px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+button{
+background:#ff3b3b;
+color:white;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.alert{
+background:#16a34a;
+color:white;
+padding:10px;
+margin-bottom:20px;
+border-radius:8px;
+}
+
+</style>
+
+{% endblock %}

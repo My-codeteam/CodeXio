@@ -1,0 +1,310 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Course module
+
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+body{
+background:#0c1117;
+font-family:Segoe UI, sans-serif;
+color:white;
+margin:0;
+padding:0;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+padding:40px 20px;
+}
+
+/* BACK BUTTON */
+
+.back-btn{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:12px 20px;
+background:#111826;
+border:1px solid #1f2933;
+border-radius:8px;
+color:white;
+text-decoration:none;
+margin-bottom:30px;
+transition:0.3s;
+}
+
+.back-btn:hover{
+background:#ff3b3b;
+}
+
+/* MODULE CONTENT */
+
+.content-box{
+background:#111826;
+padding:25px;
+border-radius:14px;
+border:1px solid #1f2933;
+margin-bottom:25px;
+}
+
+.content-box h1{
+margin-top:0;
+font-size:32px;
+}
+
+.content-box p{
+line-height:1.7;
+color:#c4ccd6;
+}
+
+/* ASSIGNMENT */
+
+.assignment{
+background:#0f141b;
+padding:20px;
+border-radius:12px;
+margin-top:25px;
+border:1px solid #1f2933;
+}
+
+.assignment h3{
+margin-top:0;
+}
+
+/* INPUT */
+
+input[type="url"]{
+width:100%;
+padding:14px;
+margin-top:15px;
+border-radius:8px;
+border:1px solid #333;
+background:#0c1117;
+color:white;
+box-sizing:border-box;
+}
+
+/* BUTTON */
+
+.submit-btn{
+background:#ff3b3b;
+border:none;
+padding:12px 20px;
+color:white;
+border-radius:8px;
+margin-top:15px;
+cursor:pointer;
+font-weight:600;
+width:100%;
+transition:0.3s;
+}
+
+.submit-btn:hover{
+opacity:0.9;
+}
+
+/* LIVE CLASS */
+
+.class-btn{
+display:inline-block;
+padding:12px 18px;
+background:#ff3b3b;
+border-radius:8px;
+color:white;
+text-decoration:none;
+font-weight:600;
+margin-top:15px;
+}
+
+/* DEADLINE */
+
+.deadline-box{
+background:#111826;
+padding:20px;
+border-radius:12px;
+border:1px solid #1f2933;
+margin-top:25px;
+}
+
+#countdown{
+margin-top:10px;
+font-size:18px;
+color:#facc15;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.container{
+padding:20px 15px;
+}
+
+.content-box{
+padding:20px;
+}
+
+.content-box h1{
+font-size:24px;
+}
+
+.back-btn,
+.class-btn{
+width:100%;
+justify-content:center;
+text-align:center;
+}
+
+}
+
+</style>
+
+<div class="container">
+
+<!-- BACK BUTTON -->
+
+<a href="{% url 'courses:student_portal' %}" class="back-btn">
+← Back To Dashboard
+</a>
+
+<!-- MODULE CONTENT -->
+
+<div class="content-box">
+
+<h1>{{ module.title|linebreaks }}</h1>
+
+<p>{{ module.content|linebreaks }}</p>
+
+{% if module.course.course_type == "live" %}
+
+<div class="assignment">
+
+<h3>Live Class</h3>
+
+{% if module.class_url %}
+
+<a href="{{ module.class_url }}" target="_blank" class="class-btn">
+Join Live Class
+</a>
+
+{% endif %}
+
+{% if module.class_date %}
+
+<p style="margin-top:15px;">
+Class Date: {{ module.class_date }}
+</p>
+
+{% endif %}
+
+<h3 style="margin-top:30px;">
+Assignment
+</h3>
+
+{% if assignment %}
+
+<p>{{ assignment.description }}</p>
+
+<form method="POST" action="{% url 'submit_assignment' assignment.id %}">
+{% csrf_token %}
+
+<input
+type="url"
+name="link"
+placeholder="Paste GitHub / Live URL"
+required
+>
+
+<button type="submit" class="submit-btn">
+Submit Assignment
+</button>
+
+</form>
+
+{% else %}
+
+<p>No assignment for this module yet.</p>
+
+{% endif %}
+
+</div>
+
+<!-- DEADLINE -->
+
+<div class="deadline-box">
+
+<h3>Assignment Deadline</h3>
+
+<p id="countdown"></p>
+
+</div>
+
+<script>
+
+var deadline = new Date(
+"{{deadline|date:'Y-m-d H:i:s'}}"
+).getTime();
+
+var x = setInterval(function(){
+
+var now = new Date().getTime();
+
+var distance = deadline - now;
+
+var days = Math.floor(
+distance / (1000 * 60 * 60 * 24)
+);
+
+var hours = Math.floor(
+(distance % (1000 * 60 * 60 * 24))
+/ (1000 * 60 * 60)
+);
+
+var minutes = Math.floor(
+(distance % (1000 * 60 * 60))
+/ (1000 * 60)
+);
+
+document.getElementById("countdown").innerHTML =
+days + "d " +
+hours + "h " +
+minutes + "m ";
+
+if(distance < 0){
+
+clearInterval(x);
+
+document.getElementById("countdown").innerHTML =
+ "Deadline Passed";
+
+}
+
+},1000);
+
+</script>
+
+{% else %}
+
+<form method="POST" action="{% url 'complete_module' module.id %}">
+{% csrf_token %}
+
+<button class="submit-btn">
+Mark as Completed
+</button>
+
+</form>
+
+{% endif %}
+
+</div>
+
+</div>
+
+{% endblock %}

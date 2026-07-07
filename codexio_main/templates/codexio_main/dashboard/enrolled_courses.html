@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %} Enrolled Courses
+{% endblock %}
+
+{% block css_files %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+
+<style>
+/* MENU BUTTON (HAMBURGER) */
+
+.menu-btn{
+display:none;
+font-size:24px;
+cursor:pointer;
+color:#0f141b;
+z-index:30000;
+}
+
+
+/* SIDEBAR NAVIGATION */
+
+.sidebar{
+width:230px;
+height:100vh;
+position:fixed;
+background:#0f141b;
+padding-top:30px;
+left:0;
+transition:0.3s;
+}
+
+
+/* SIDEBAR TITLE */
+
+.sidebar h2{
+text-align:center;
+color:#ff3b3b;
+margin-bottom:40px;
+}
+
+
+/* NAVIGATION LINKS */
+
+.sidebar a{
+display:block;
+padding:15px 25px;
+color:#bbb;
+text-decoration:none;
+}
+
+
+/* NAV HOVER */
+
+.sidebar a:hover{
+background:#1b2430;
+color:white;
+}
+
+
+/* ACTIVE PAGE */
+
+.sidebar a.active{
+background:#1b2430;
+color:white;
+border-left:4px solid #ff3b3b;
+}
+
+.main{
+margin-left:230px;
+padding:30px 40px;
+transition:0.3s;
+}
+
+/* MOBILE RESPONSIVE NAVIGATION */
+
+@media (max-width:900px){
+
+.sidebar{
+left:-230px;
+}
+
+.main{
+margin-left:0;
+padding:20px;
+}
+
+.sidebar.active{
+left:0;
+width:100%;
+height:100%;
+z-index:999;
+}
+
+.menu-btn{
+display:block;
+position: relative;
+z-index: 7000;
+}
+
+}
+
+.sidebar{
+transition: left 0.35s ease;
+}
+
+.courses-container{
+
+padding:40px;
+
+}
+
+.course-grid{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+
+}
+
+.course-card{
+
+background:#1e1e2f;
+padding:20px;
+border-radius:10px;
+text-decoration:none;
+color:white;
+transition:0.3s;
+
+}
+
+.course-card:hover{
+
+transform:translateY(-5px);
+background:#2b2b45;
+
+}
+
+.course-card h3{
+
+margin-bottom:10px;
+color:#4da3ff;
+
+}
+
+.menu-btn.active{
+color:white;
+}
+</style>
+
+{% include "components/sidebar.html" %}
+
+<!-- MAIN CONTENT -->
+
+<div class="main">
+
+<div class="header">
+
+<div class="menu-btn" onclick="toggleMenu()" id="menuBtn">
+<i class="fa-solid fa-bars"></i>
+</div>
+
+<div class="courses-container">
+
+<h2>My Courses</h2>
+
+<div class="course-grid">
+
+{% for enrollment in enrollments %}
+
+<a href="{% url 'course_detail' enrollment.course.id %}" class="course-card">
+
+<h3>{{ enrollment.course.title }}</h3>
+
+<p>{{ enrollment.course.description|truncatewords:20 }}</p>
+
+</a>
+
+{% empty %}
+
+<p>You are not enrolled in any course yet.</p>
+
+{% endfor %}
+
+</div>
+
+</div>
+<script>
+    function toggleMenu(){
+       let sidebar = document.getElementById("sidebar")
+       let menuBtn = document.getElementById("menuBtn")
+
+       sidebar.classList.toggle("active")
+       menuBtn.classList.toggle("active")
+    }
+</script>
+
+</div>
+</div>
+
+{% endblock %}
