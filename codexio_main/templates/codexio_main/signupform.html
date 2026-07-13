@@ -209,8 +209,11 @@
 
         <button type="submit" name="login_submit">Login</button>
       </form>
+      <p style="margin-top: 0.8rem; text-align: center;">
+        <a href="{% url 'users:password_reset_request' %}" style="color: #ff6666; text-decoration: none;">Forgot password?</a>
+      </p>
     </div>
-
+     
     <div id="register-form" class="form-box hidden">
       <h2>Register</h2>
       <form method="POST">
