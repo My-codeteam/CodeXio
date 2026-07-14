@@ -620,15 +620,30 @@ def verify_email(request, token):
         token=token
     )
 
+    if verification.verified:
+        messages.info(request, "Email already verified.")
+        return redirect("/signup")
+
+    if verification.is_expired:
+
+        user = verification.user
+
+        user.delete()
+
+        messages.error(
+            request,
+            "Verification link expired. Please register again."
+        )
+
+        return redirect("/signup")
+
     verification.verified = True
     verification.save()
 
     user = verification.user
 
     user.is_verified = True
-
-    user.verified_at = now()
-
+    user.verified_at = timezone.now()
     user.save()
 
     messages.success(

@@ -42,7 +42,6 @@ class User(AbstractUser):
 
             self.student_id = f"CM-{year}-{new_number:04d}"
 
-        super().save(*args, **kwargs)
 
         if not self.github_username:
 
@@ -72,6 +71,10 @@ class EmailVerification(models.Model):
 
     def __str__(self):
         return self.user.username
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=10)
 
 
 class PasswordReset(models.Model):
