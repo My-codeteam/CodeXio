@@ -297,7 +297,7 @@ def submit_assignment(request, assignment_id):
 
     if request.method == "POST":
 
-        link = request.FILES.get("link")
+        link = request.POST.get("link")
 
         Submission.objects.update_or_create(
             assignment=assignment,

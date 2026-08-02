@@ -309,9 +309,80 @@ gap:5px;
 
 </div>
 
+
+<!-- Mentor Requests -->
+
+<h2>Mentor Requests</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Challenge</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for request in requests %}
+
+        <tr>
+
+            <td>{{ request.user.username }}</td>
+
+            <td>{{ request.user.email }}</td>
+
+            <td>{{ request.course.title }}</td>
+
+            <td>{{ request.challenge }}</td>
+
+            <td>{{ request.status }}</td>
+
+            <td>{{ request.created_at }}</td>
+
+            <td>
+
+                {% if request.status == "pending" %}
+
+                    <a href="{% url 'courses:approve_mentor_request' request.id %}">
+                        Approve
+                    </a>
+
+                    |
+
+                    <a href="{% url 'courses:reject_mentor_request' request.id %}">
+                        Reject
+                    </a>
+
+                {% elif request.status == "approved" %}
+
+                    <a href="{% url 'courses:complete_mentor_request' request.id %}">
+                        Mark Completed
+                    </a>
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
 <form action="{% url 'users:logout' %}" method="POST">
 {% csrf_token %}
 <i class="fa-solid fa-right-from-bracket"><button type="submit">Logout</button></i>
 </form>
-
 {% endblock %}

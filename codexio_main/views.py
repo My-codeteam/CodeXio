@@ -14,7 +14,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count
 
 User = get_user_model()
-from courses.models import Course, Enrollment, UpdateNotification, Module, CompletedCourse
+from courses.models import Course, Enrollment, UpdateNotification, Module, CompletedCourse, MentorRequest
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from assignments.models import Assignment
@@ -692,6 +692,11 @@ def admin_dashboard(request):
 
     modules = Module.objects.select_related('course').all()
 
+    requests = MentorRequest.objects.select_related(
+        "user",
+        "course"
+    ).order_by("-created_at")
+
     if query:
         users = User.objects.filter(username__icontains=query)
         courses = Course.objects.filter(title__icontains=query)
@@ -700,7 +705,8 @@ def admin_dashboard(request):
         "users": users,
         "courses": courses,
         "modules": modules,
-        "query": query
+        "query": query,
+        "requests": requests,
     }
 
     return render(request, "codexio_main/dashboard/admin_panel/admin.html", context)
@@ -807,7 +813,7 @@ def create_module(request):
             order=order
         )
 
-    return redirect("courses:admin_dashboard")
+    return redirect('courses:admin_dashboard')
 
 @staff_member_required
 def create_assignment(request):
@@ -819,7 +825,7 @@ def create_assignment(request):
         instructions = request.POST.get("instructions")
 
         if not module_id:
-            return redirect("courses:admin_dashboard")
+            return redirect('courses:admin_dashboard')
 
         module = get_object_or_404(Module, id=module_id)
 
@@ -829,7 +835,70 @@ def create_assignment(request):
             description=instructions
         )
 
-    return redirect("courses:admin_dashboard")
+    return redirect('courses:admin_dashboard')
+
+@staff_member_required
+def approve_mentor_request(request, request_id):
+
+    mentor_request = get_object_or_404(
+        MentorRequest,
+        id=request_id
+    )
+
+    mentor_request.status = "approved"
+    mentor_request.save()
+
+    messages.success(
+        request,
+        "Mentor request approved."
+    )
+
+    return redirect('courses:admin_dashboard')
+
+@staff_member_required
+def reject_mentor_request(request, request_id):
+
+    mentor_request = get_object_or_404(
+        MentorRequest,
+        id=request_id
+    )
+
+    mentor_request.status = "rejected"
+    mentor_request.save()
+
+    messages.success(
+        request,
+        "Mentor request rejected."
+    )
+
+    return redirect('courses:admin_dashboard')
+
+@staff_member_required
+def complete_mentor_request(request, request_id):
+
+    mentor_request = get_object_or_404(
+        MentorRequest,
+        id=request_id
+    )
+
+    if mentor_request.status != "completed":
+
+        mentor_request.status = "completed"
+        mentor_request.save()
+
+        reputation, _ = StudentReputation.objects.get_or_create(
+            user=mentor_request.user
+        )
+
+        reputation.mentor_sessions += 1
+        reputation.calculate_score()
+
+    messages.success(
+        request,
+        "Mentor session completed."
+    )
+
+    return redirect('courses:admin_dashboard')
 
 @login_required
 def live_courses(request):
