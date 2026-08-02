@@ -463,6 +463,11 @@ def signup(request):
 
             login(request, user)
 
+            last_page = request.session.get("last_page")
+
+            if last_page:
+               return redirect(last_page["url"])
+
             if user.is_staff or user.is_superuser:
                 return redirect("courses:admin_dashboard")
 

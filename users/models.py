@@ -126,15 +126,15 @@ class StudentReputation(models.Model):
 
         self.total_score = (
 
-            (self.completed_courses * 10)
+            (self.completed_courses * 5)
 
             +
 
-            (self.github_contributions * 1)
+            (self.github_contributions * 25)
 
             +
 
-            (self.assignments_submitted * 2)
+            (self.assignments_submitted * 10)
 
             +
 
@@ -142,7 +142,7 @@ class StudentReputation(models.Model):
 
             +
 
-            (self.mentor_sessions * 5)
+            (self.mentor_sessions * 2)
 
         )
 

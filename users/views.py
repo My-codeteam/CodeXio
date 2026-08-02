@@ -7,6 +7,8 @@ from django.utils.timezone import now, timedelta
 from services.resend_service import send_email
 import random
 import string
+from django.contrib.auth.views import LogoutView
+
 
 def signup_login_view(request):
 
@@ -221,3 +223,12 @@ def delete_account(request):
         return redirect("home")
 
     return render(request,"users/delete_confirm.html")
+
+class CustomLogoutView(LogoutView):
+    next_page = "/"
+
+    def post(self, request, *args, **kwargs):
+        # Clear the saved page on manual logout
+        request.session.pop("last_page", None)
+
+        return super().post(request, *args, **kwargs)
