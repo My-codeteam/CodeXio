@@ -103,6 +103,219 @@ gap:5px;
 }
 
 }
+
+/* ASSIGNMENT SECTION */
+
+.assignment-card{
+background:#fff;
+padding:20px;
+border-radius:8px;
+margin-bottom:25px;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+
+.assignment-card h3{
+margin-bottom:18px;
+color:#222;
+}
+
+.assignment-card label{
+display:block;
+margin-top:12px;
+margin-bottom:6px;
+font-weight:600;
+color:#555;
+}
+
+.assignment-card input,
+.assignment-card textarea,
+.assignment-card select{
+width:100%;
+padding:10px;
+border:1px solid #ccc;
+border-radius:6px;
+margin-bottom:15px;
+font-size:15px;
+}
+
+.assignment-card textarea{
+min-height:120px;
+resize:vertical;
+}
+
+.assignment-card button{
+background:#0b5cff;
+color:#fff;
+padding:11px 20px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-weight:600;
+transition:.3s;
+}
+
+.assignment-card button:hover{
+background:#0949cc;
+}
+
+
+/* MENTOR REQUEST TABLE */
+
+.mentor-card{
+background:#fff;
+padding:20px;
+border-radius:8px;
+margin-bottom:25px;
+box-shadow:0 2px 8px rgba(0,0,0,.05);
+overflow-x:auto;
+}
+
+.mentor-card h3{
+margin-bottom:18px;
+}
+
+.mentor-table{
+width:100%;
+border-collapse:collapse;
+min-width:900px;
+}
+
+.mentor-table th{
+background:#0b5cff;
+color:#fff;
+padding:14px;
+text-align:left;
+font-size:15px;
+}
+
+.mentor-table td{
+padding:12px;
+border-bottom:1px solid #ececec;
+vertical-align:top;
+}
+
+.mentor-table tr:nth-child(even){
+background:#fafafa;
+}
+
+.mentor-table tr:hover{
+background:#f2f6ff;
+}
+
+
+/* STATUS BADGES */
+
+.status{
+padding:6px 12px;
+border-radius:20px;
+font-size:13px;
+font-weight:600;
+display:inline-block;
+}
+
+.status.pending{
+background:#fff4d8;
+color:#c78d00;
+}
+
+.status.approved{
+background:#dff7e4;
+color:#14853c;
+}
+
+.status.completed{
+background:#d9f2ff;
+color:#0066a6;
+}
+
+.status.rejected{
+background:#ffe0e0;
+color:#b60000;
+}
+
+
+/* ACTION BUTTONS */
+
+.action-btn{
+display:inline-block;
+padding:7px 12px;
+border-radius:5px;
+text-decoration:none;
+color:white;
+font-size:14px;
+margin:2px;
+transition:.3s;
+}
+
+.approve-btn{
+background:#28a745;
+}
+
+.approve-btn:hover{
+background:#208838;
+}
+
+.reject-btn{
+background:#dc3545;
+}
+
+.reject-btn:hover{
+background:#bf2635;
+}
+
+.complete-btn{
+background:#0b5cff;
+}
+
+.complete-btn:hover{
+background:#0949cc;
+}
+
+
+/* LOGOUT */
+
+.logout-card{
+text-align:center;
+margin-top:30px;
+}
+
+.logout-btn{
+background:#dc3545;
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:6px;
+cursor:pointer;
+font-size:15px;
+font-weight:600;
+transition:.3s;
+}
+
+.logout-btn:hover{
+background:#b81d2d;
+}
+
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.assignment-card,
+.mentor-card{
+padding:15px;
+}
+
+.assignment-card button{
+width:100%;
+}
+
+.action-btn{
+display:block;
+margin-bottom:8px;
+text-align:center;
+}
+
+}
 </style>
 
 <div class="admin-container">
@@ -274,6 +487,10 @@ gap:5px;
 
 </div>
 
+<div class="assignment-card">
+
+<h3>Create Assignment</h3>
+
 <form method="POST" action="{% url 'courses:create_assignment' %}">
 
 {% csrf_token %}
@@ -309,10 +526,11 @@ gap:5px;
 
 </div>
 
-
 <!-- Mentor Requests -->
 
-<h2>Mentor Requests</h2>
+<div class="mentor-card">
+
+<h3>Mentor Requests</h3>
 
 <table>
     <thead>
@@ -341,7 +559,7 @@ gap:5px;
 
             <td>{{ request.challenge }}</td>
 
-            <td>{{ request.status }}</td>
+            <td><span class="status {{ request.status }}">{{ request.status|title }}</span></td>
 
             <td>{{ request.created_at }}</td>
 
@@ -349,22 +567,19 @@ gap:5px;
 
                 {% if request.status == "pending" %}
 
-                    <a href="{% url 'courses:approve_mentor_request' request.id %}">
-                        Approve
+                    <a href="{% url 'courses:approve_mentor_request' request.id %}" class="action-btn approve-btn">
+                      Approve
                     </a>
 
-                    |
-
-                    <a href="{% url 'courses:reject_mentor_request' request.id %}">
-                        Reject
+                    <a href="{% url 'courses:reject_mentor_request' request.id %}" class="action-btn reject-btn">
+                      Reject
                     </a>
 
                 {% elif request.status == "approved" %}
 
-                    <a href="{% url 'courses:complete_mentor_request' request.id %}">
-                        Mark Completed
+                    <a href="{% url 'courses:complete_mentor_request' request.id %}" class="action-btn complete-btn">
+                      Mark Completed
                     </a>
-
                 {% else %}
 
                     -
@@ -381,8 +596,35 @@ gap:5px;
 
 </table>
 
+</div>
+
+<div class="admin-card">
+
+<h3>Assignments</h3>
+
+<p>
+Review all assignment submissions from students.
+</p>
+
+<a href="{% url 'courses:assignment_submissions' %}" class="action-btn complete-btn">
+
+View Submissions
+
+</a>
+
+</div>
+
+<div class="logout-card">
+
 <form action="{% url 'users:logout' %}" method="POST">
 {% csrf_token %}
-<i class="fa-solid fa-right-from-bracket"><button type="submit">Logout</button></i>
+
+<button type="submit" class="logout-btn">
+<i class="fa-solid fa-right-from-bracket"></i>
+ Logout
+</button>
+
 </form>
+
+</div>
 {% endblock %}

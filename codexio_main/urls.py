@@ -47,4 +47,14 @@ urlpatterns = [
     views.complete_mentor_request,
     name="complete_mentor_request",
     ),
+    path(
+    "assignment-submissions/",
+    views.assignment_submissions,
+    name="assignment_submissions",
+    ),
+    path(
+    "my-submissions/",
+    views.my_submissions,
+    name="my_submissions",
+    ),
 ]

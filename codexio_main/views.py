@@ -4,6 +4,7 @@ from nltk.chat.util import Chat, reflections
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import *
+from assignments.models import Submission
 from users.models import User, EmailVerification, StudentReputation
 from django.db.models.functions import Now
 from datetime import timedelta
@@ -396,6 +397,30 @@ def student_portal(request):
         context
     )
 
+
+@login_required
+def my_submissions(request):
+
+    submissions = (
+        Submission.objects
+        .filter(student=request.user)
+        .select_related(
+            "assignment",
+            "assignment__module",
+            "assignment__module__course"
+        )
+        .order_by("-submitted_at")
+    )
+
+    context = {
+        "submissions": submissions
+    }
+
+    return render(
+        request,
+        "codexio_main/dashboard/submissions/my_submissions.html",
+        context
+    )
 
 def signup(request):
 
@@ -899,6 +924,30 @@ def complete_mentor_request(request, request_id):
     )
 
     return redirect('courses:admin_dashboard')
+
+@staff_member_required
+def assignment_submissions(request):
+
+    submissions = (
+        Submission.objects
+        .select_related(
+            "student",
+            "assignment",
+            "assignment__module",
+            "assignment__module__course"
+        )
+        .order_by("-submitted_at")
+    )
+
+    context = {
+        "submissions": submissions
+    }
+
+    return render(
+        request,
+        "codexio_main/dashboard/admin_panel/assignment_submissions.html",
+        context
+    )
 
 @login_required
 def live_courses(request):

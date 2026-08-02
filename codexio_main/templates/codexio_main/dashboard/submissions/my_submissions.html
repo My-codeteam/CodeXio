@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Assignment Submissions
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.submission-container{
+max-width:1100px;
+margin:auto;
+padding:30px 20px;
+}
+
+.page-title{
+margin-bottom:25px;
+}
+
+.submission-card{
+background:white;
+border-radius:8px;
+padding:20px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+overflow-x:auto;
+}
+
+.submission-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.submission-table th{
+background:#0b5cff;
+color:white;
+padding:12px;
+text-align:left;
+}
+
+.submission-table td{
+padding:12px;
+border-bottom:1px solid #eee;
+}
+
+.status{
+padding:5px 12px;
+border-radius:20px;
+font-size:13px;
+font-weight:bold;
+}
+
+.pending{
+background:#fff3cd;
+color:#856404;
+}
+
+.graded{
+background:#d4edda;
+color:#155724;
+}
+
+.view-btn{
+background:#0b5cff;
+color:white;
+padding:8px 14px;
+text-decoration:none;
+border-radius:5px;
+}
+
+.view-btn:hover{
+opacity:.9;
+}
+
+@media(max-width:768px){
+
+.submission-card{
+overflow-x:auto;
+}
+
+}
+
+</style>
+
+<div class="submission-container">
+
+<h2 class="page-title">
+My Assignment Submissions
+</h2>
+
+<div class="submission-card">
+
+<table class="submission-table">
+
+<thead>
+
+<tr>
+
+<th>Course</th>
+
+<th>Module</th>
+
+<th>Assignment</th>
+
+<th>Submitted</th>
+
+<th>Project</th>
+
+<th>Grade</th>
+
+<th>Feedback</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for submission in submissions %}
+
+<tr>
+
+<td>{{ submission.assignment.module.course.title }}</td>
+
+<td>{{ submission.assignment.module.title }}</td>
+
+<td>{{ submission.assignment.title }}</td>
+
+<td>{{ submission.submitted_at }}</td>
+
+<td>
+
+<a
+href="{{ submission.link }}"
+target="_blank"
+class="view-btn">
+
+Open
+
+</a>
+
+</td>
+
+<td>
+
+{% if submission.grade %}
+{{ submission.grade }}
+{% else %}
+-
+{% endif %}
+
+</td>
+
+<td>
+
+{% if submission.feedback %}
+{{ submission.feedback }}
+{% else %}
+Awaiting grading
+{% endif %}
+
+</td>
+
+<td>
+
+{% if submission.grade %}
+<span class="status graded">
+Graded
+</span>
+{% else %}
+<span class="status pending">
+Pending
+</span>
+{% endif %}
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="8">
+You have not submitted any assignments yet.
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+{% endblock %}

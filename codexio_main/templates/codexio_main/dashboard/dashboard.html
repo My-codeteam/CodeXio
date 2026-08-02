@@ -392,7 +392,19 @@ transition: left 0.35s ease;
 <small>{{ request.user.student_id }}</small>
 
 </div>
+<div class="dashboard-card">
 
+<h3>My Assignments</h3>
+
+<p>
+View all submitted assignments, grades and instructor feedback.
+</p>
+
+<a href="{% url 'courses:my_submissions' %}">
+View Submissions
+</a>
+
+</div>
 <a href="{% url 'users:edit_profile' %}">
 <i class="fa-solid fa-user"></i> Edit Profile
 </a>
