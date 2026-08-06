@@ -10,48 +10,6 @@ import string
 from django.contrib.auth.views import LogoutView
 
 
-def signup_login_view(request):
-
-    if request.method == "POST":
-
-        # LOGIN
-        if "login_submit" in request.POST:
-
-            username = request.POST.get("username")
-            password = request.POST.get("password")
-
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                login(request, user)
-                return redirect("student_portal")
-            else:
-                messages.error(request, "Invalid username or password")
-
-
-        # REGISTER
-        if "signup_submit" in request.POST:
-
-            username = request.POST.get("username")
-            email = request.POST.get("email")
-            phone = request.POST.get("phone")
-            country = request.POST.get("country")
-            password = request.POST.get("password")
-
-            user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password,
-                phone=phone,
-                country=country
-            )
-
-            login(request, user)
-
-            return redirect("student_portal")
-
-    return render(request, "codexio_main/signupform.html")
-
 
 def password_reset_request(request):
     """Request password reset by email"""
@@ -184,7 +142,7 @@ def password_reset_confirm(request):
                 del request.session['reset_code_id']
 
             messages.success(request, "Password reset successfully! Please login with your new password.")
-            return redirect("users:login")
+            return redirect("courses:signup")
 
         except (User.DoesNotExist, PasswordReset.DoesNotExist):
             messages.error(request, "An error occurred. Please try again.")
@@ -220,12 +178,12 @@ def delete_account(request):
         user = request.user
         user.delete()
 
-        return redirect("home")
+        return redirect("courses:signup")
 
     return render(request,"users/delete_confirm.html")
 
 class CustomLogoutView(LogoutView):
-    next_page = "/"
+    next_page = "courses:signup"
 
     def post(self, request, *args, **kwargs):
         # Clear the saved page on manual logout

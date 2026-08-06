@@ -496,7 +496,7 @@ def signup(request):
             if user.is_staff or user.is_superuser:
                 return redirect("courses:admin_dashboard")
 
-            return redirect("/student_portal")
+            return redirect("courses:student_portal")
 
         # REGISTER
         elif "signup_submit" in request.POST:

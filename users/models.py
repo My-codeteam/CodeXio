@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.timezone import now
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your models here.
 from django.contrib.auth.models import AbstractUser

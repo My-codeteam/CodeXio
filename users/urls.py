@@ -6,8 +6,8 @@ from .views import CustomLogoutView
 app_name = "users"
 
 urlpatterns = [
-    path("signup_login/", views.signup_login_view, name="signup_login"),
-    path("login/", views.signup_login_view, name="login"),
+    #path("signup_login/", views.signup_login_view, name="signup_login"),
+    #path("login/", views.signup_login_view, name="login"),
     path("profile/edit/", views.edit_profile, name="edit_profile"),
     path("account/delete/", views.delete_account, name="delete_account"),
     path("logout/", CustomLogoutView.as_view(), name="logout"),
