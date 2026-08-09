@@ -15,7 +15,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count
 
 User = get_user_model()
-from courses.models import Course, Enrollment, UpdateNotification, Module, CompletedCourse, MentorRequest
+from courses.models import Course, Enrollment, UpdateNotification, Module, CompletedCourse, MentorRequest, ProjectContribution
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from assignments.models import Assignment
@@ -722,6 +722,10 @@ def admin_dashboard(request):
         "course"
     ).order_by("-created_at")
 
+    contributions = ProjectContribution.objects.all().order_by(
+    "-submitted_at"
+    )
+
     if query:
         users = User.objects.filter(username__icontains=query)
         courses = Course.objects.filter(title__icontains=query)
@@ -732,9 +736,77 @@ def admin_dashboard(request):
         "modules": modules,
         "query": query,
         "requests": requests,
+        "contributions": contributions,
     }
 
     return render(request, "codexio_main/dashboard/admin_panel/admin.html", context)
+
+@staff_member_required
+def approve_project_contribution(request, contribution_id):
+
+    contribution = get_object_or_404(
+        ProjectContribution,
+        id=contribution_id
+    )
+
+    if contribution.status == "approved":
+        messages.warning(
+            request,
+            "This contribution has already been approved."
+        )
+        return redirect("admin_dashboard")
+
+    grade = int(request.POST.get("grade"))
+
+    contribution.grade = grade
+    contribution.status = "approved"
+    contribution.reviewed_at = timezone.now()
+    contribution.save()
+
+    reputation, created = StudentReputation.objects.get_or_create(
+        user=contribution.student
+    )
+
+    reputation.github_contributions += 1
+    reputation.project_contribution_grade += grade
+
+    reputation.calculate_score()
+
+    messages.success(
+        request,
+        "Contribution approved and reputation updated."
+    )
+
+
+    return redirect(
+        "courses:admin_dashboard"
+    )
+
+@staff_member_required
+def reject_project_contribution(request, contribution_id):
+
+    contribution = get_object_or_404(
+        ProjectContribution,
+        id=contribution_id
+    )
+
+    if contribution.status == "approved":
+        messages.warning(
+            request,
+            "This contribution has already been approved."
+        )
+        return redirect("admin_dashboard")
+
+    contribution.status = "rejected"
+    contribution.reviewed_at = timezone.now()
+    contribution.save()
+
+    messages.success(
+        request,
+        "Project contribution rejected."
+    )
+
+    return redirect("admin_dashboard")
 
 @staff_member_required
 def create_course(request):

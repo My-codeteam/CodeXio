@@ -57,4 +57,14 @@ urlpatterns = [
     views.my_submissions,
     name="my_submissions",
     ),
+    path(
+    "approve-project-contribution/<int:contribution_id>/",
+    views.approve_project_contribution,
+    name="approve_project_contribution"
+    ),
+    path(
+    "project-contribution/<int:contribution_id>/reject/",
+    views.reject_project_contribution,
+    name="reject_project_contribution"
+    ),
 ]

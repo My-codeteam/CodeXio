@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import MentorRequest, Course, Module, ModuleAccess, Enrollment, Progress, UpdateNotification, Attendance, CompletedCourse, Certificate, ClassSession
+from .models import MentorRequest, Course, Module, ModuleAccess, Enrollment, Progress, UpdateNotification, Attendance, CompletedCourse, Certificate, ClassSession, ProjectContribution
 # Register your models here.
 admin.site.register(Course)
 admin.site.register(Module)
@@ -10,6 +10,8 @@ admin.site.register(CompletedCourse)
 admin.site.register(Certificate)
 admin.site.register(ModuleAccess)
 admin.site.register(ClassSession)
+admin.site.register(ProjectContribution)
+
 
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):

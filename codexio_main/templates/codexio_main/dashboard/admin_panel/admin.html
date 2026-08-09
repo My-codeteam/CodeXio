@@ -316,6 +316,256 @@ text-align:center;
 }
 
 }
+
+/* CONTAINER */
+
+.contributions-container{
+    max-width:1250px;
+    margin:0 auto;
+    padding:40px 20px;
+}
+
+/* HEADER */
+
+.contributions-header{
+    margin-bottom:30px;
+}
+
+.contributions-header h2{
+    margin:0 0 8px;
+    font-size:30px;
+}
+
+.contributions-header p{
+    margin:0;
+    color:#9ca3af;
+}
+
+/* CARD */
+
+.contributions-card{
+    background:#111826;
+    border:1px solid #1f2937;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* TABLE WRAPPER */
+
+.table-wrapper{
+    width:100%;
+    overflow-x:auto;
+}
+
+/* TABLE */
+
+.contributions-table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:900px;
+}
+
+.contributions-table th{
+    background:#151d2a;
+    color:#d1d5db;
+    text-align:left;
+    padding:15px;
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    border-bottom:1px solid #293241;
+}
+
+.contributions-table td{
+    padding:16px 15px;
+    border-bottom:1px solid #1f2937;
+    color:#d1d5db;
+    vertical-align:top;
+}
+
+.contributions-table tr:last-child td{
+    border-bottom:none;
+}
+
+.contributions-table tbody tr{
+    transition:0.2s;
+}
+
+.contributions-table tbody tr:hover{
+    background:#151d2a;
+}
+
+/* STUDENT */
+
+.student-name{
+    font-weight:600;
+    color:white;
+}
+
+.project-name{
+    font-weight:600;
+    color:#f3f4f6;
+}
+
+/* DESCRIPTION */
+
+.description{
+    max-width:280px;
+    line-height:1.5;
+    color:#9ca3af;
+}
+
+/* PROJECT LINK */
+
+.project-link{
+    display:inline-block;
+    padding:7px 12px;
+    background:#1d2736;
+    border:1px solid #334155;
+    border-radius:6px;
+    color:#ff5a5a;
+    text-decoration:none;
+    font-size:13px;
+    transition:0.2s;
+}
+
+.project-link:hover{
+    background:#ff3b3b;
+    color:white;
+    border-color:#ff3b3b;
+}
+
+/* STATUS */
+
+.status{
+    display:inline-block;
+    padding:5px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.status-pending{
+    background:#3b2f00;
+    color:#fde68a;
+    border:1px solid #6b5500;
+}
+
+.status-approved{
+    background:#052e16;
+    color:#86efac;
+    border:1px solid #166534;
+}
+
+.status-rejected{
+    background:#450a0a;
+    color:#fca5a5;
+    border:1px solid #7f1d1d;
+}
+
+/* APPROVAL FORM */
+
+.approve-form{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.grade-input{
+    width:90px;
+    padding:9px;
+    box-sizing:border-box;
+    background:#0c1117;
+    border:1px solid #374151;
+    color:white;
+    border-radius:6px;
+    outline:none;
+}
+
+.grade-input:focus{
+    border-color:#ff3b3b;
+}
+
+.approve-btn{
+    padding:9px 13px;
+    background:#ff3b3b;
+    border:none;
+    color:white;
+    border-radius:6px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.approve-btn:hover{
+    background:#e62f2f;
+}
+
+/* EMPTY STATE */
+
+.empty-state{
+    padding:50px 20px;
+    text-align:center;
+    color:#6b7280;
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .contributions-container{
+        padding:25px 15px;
+    }
+
+    .contributions-header h2{
+        font-size:24px;
+    }
+
+}
+
+.action-wrapper{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    min-width:130px;
+}
+
+.approve-form{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.reject-form{
+    width:100%;
+}
+
+.reject-btn{
+    width:100%;
+    padding:8px 12px;
+    background:#450a0a;
+    border:1px solid #7f1d1d;
+    color:#fca5a5;
+    border-radius:6px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.reject-btn:hover{
+    background:#ef4444;
+    color:white;
+    border-color:#ef4444;
+}
+
+@media(max-width:768px){
+
+    .action-wrapper{
+        min-width:150px;
+    }
+
+}
 </style>
 
 <div class="admin-container">
@@ -611,6 +861,246 @@ Review all assignment submissions from students.
 View Submissions
 
 </a>
+
+</div>
+
+
+<div class="contributions-container">
+
+    <div class="contributions-header">
+
+        <h2>
+            Project Contributions
+        </h2>
+
+        <p>
+            Review student project contributions and award contribution points.
+        </p>
+
+    </div>
+
+
+    <div class="contributions-card">
+
+        {% if contributions %}
+
+        <div class="table-wrapper">
+
+            <table class="contributions-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Student
+                        </th>
+
+                        <th>
+                            Project
+                        </th>
+
+                        <th>
+                            GitHub / Project
+                        </th>
+
+                        <th>
+                            Description
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for contribution in contributions %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="student-name">
+                                {{ contribution.student.username }}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            <div class="project-name">
+                                {{ contribution.project_name }}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            <a
+                                href="{{ contribution.project_link }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="project-link"
+                            >
+                                View Project ↗
+                            </a>
+
+                        </td>
+
+
+                        <td>
+
+                            <div class="description">
+
+                                {% if contribution.contribution_description %}
+
+                                    {{ contribution.contribution_description }}
+
+                                {% else %}
+
+                                    No description provided.
+
+                                {% endif %}
+
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            {% if contribution.status == "pending" %}
+
+                                <span class="status status-pending">
+                                    Pending
+                                </span>
+
+                            {% elif contribution.status == "approved" %}
+
+                                <span class="status status-approved">
+                                    Approved
+                                </span>
+
+                            {% elif contribution.status == "rejected" %}
+
+                                <span class="status status-rejected">
+                                    Rejected
+                                </span>
+
+                            {% else %}
+
+                                <span class="status status-pending">
+                                    {{ contribution.status }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if contribution.status == "pending" %}
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'courses:approve_project_contribution' contribution.id %}"
+                                    class="approve-form"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="number"
+                                        name="grade"
+                                        class="grade-input"
+                                        placeholder="Score"
+                                        min="0"
+                                        max="20"
+                                        required
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="approve-btn"
+                                    >
+                                        Approve
+                                    </button>
+
+                                    <!-- REJECT -->
+
+                                    <form
+                                      method="POST"
+                                      action="{% url 'courses:reject_project_contribution' contribution.id %}"
+                                      class="reject-form"
+                                    >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                      type="submit"
+                                      class="reject-btn"
+                                      onclick="return confirm('Are you sure you want to reject this contribution?');"
+                                    >
+                                      Reject
+                                    </button>
+
+                                </form>
+
+                            {% else %}
+
+                                <span style="color:#6b7280;">
+                                    Reviewed
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+
+                        <td colspan="6">
+
+                            <div class="empty-state">
+                                No project contributions have been submitted yet.
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+            <div class="empty-state">
+                No project contributions have been submitted yet.
+            </div>
+
+        {% endif %}
+
+    </div>
 
 </div>
 

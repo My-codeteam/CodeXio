@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession, Certificate, CompletedCourse, MentorRequest, ModuleAccess
+from .models import Course, Module, Enrollment, Progress, Attendance, ClassSession, Certificate, CompletedCourse, MentorRequest, ModuleAccess, ProjectContribution
 from assignments.models import Assignment, Submission
 from django.contrib.auth.decorators import login_required
 from django.db.models import Exists, OuterRef
@@ -469,4 +469,48 @@ def request_mentor(request, course_id):
             "course": course,
             "remaining": remaining
         }
+    )
+
+@login_required
+def submit_project_contribution(request):
+
+    if request.method == "POST":
+
+        ProjectContribution.objects.create(
+
+            student=request.user,
+
+            github_username=request.POST.get(
+                "github_username"
+            ),
+
+            project_name=request.POST.get(
+                "project_name"
+            ),
+
+            project_link=request.POST.get(
+                "project_link"
+            ),
+
+            contribution_description=request.POST.get(
+                "description"
+            )
+
+        )
+
+
+        messages.success(
+            request,
+            "Project contribution submitted for review."
+        )
+
+
+        return redirect(
+            "courses:student_portal"
+        )
+
+
+    return render(
+        request,
+        "courses/project_contribution.html"
     )

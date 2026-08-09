@@ -52,6 +52,45 @@ Student Projects
     transform:translateY(-2px);
 }
 
+/* CONTRIBUTION BUTTON */
+
+.contribution-btn{
+    background:#1f2933;
+    color:white;
+    padding:10px 18px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.3s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid #374151;
+}
+
+.contribution-btn:hover{
+    background:#ff3b3b;
+    border-color:#ff3b3b;
+    transform:translateY(-2px);
+}
+
+/* CONTRIBUTION INFO */
+
+.contribution-info{
+    background:#111826;
+    border:1px solid #1f2933;
+    border-left:4px solid #ff3b3b;
+    border-radius:10px;
+    padding:16px 20px;
+    margin-bottom:25px;
+    color:#cbd5e1;
+    line-height:1.6;
+}
+
+.contribution-info strong{
+    color:white;
+}
+
 .projects-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));
@@ -156,6 +195,31 @@ Student Projects
             <i class="fas fa-arrow-left"></i>
             Back to Dashboard
         </a>
+
+    </div>
+
+    <!-- CONTRIBUTION INFORMATION -->
+
+    <div class="contribution-info">
+
+        <strong>
+            <i class="fas fa-star"></i>
+            Earn Reputation Points
+        </strong>
+
+        <br>
+
+        Have you actively contributed to a project?
+        Submit your contribution for review. An admin will verify your
+        participation and award points based on your actual contribution.
+
+        <a href="{% url 'submit_project_contribution' %}" class="contribution-btn">
+
+           <i class="fas fa-upload"></i>
+           Claim Project Contribution
+
+        </a>
+
 
     </div>
 

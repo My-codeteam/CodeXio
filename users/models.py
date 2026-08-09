@@ -120,6 +120,8 @@ class StudentReputation(models.Model):
 
     mentor_sessions = models.IntegerField(default=0)
 
+    project_contribution_grade = models.IntegerField(default=0)
+
     total_score = models.IntegerField(default=0)
 
     updated_at = models.DateTimeField(auto_now=True)
@@ -145,6 +147,10 @@ class StudentReputation(models.Model):
             +
 
             (self.mentor_sessions * 2)
+
+            +
+
+            self.project_contribution_grade
 
         )
 

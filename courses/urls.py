@@ -54,6 +54,11 @@ urlpatterns = [
        views.request_mentor,
        name="request_mentor"
     ),
+    path(
+      "project-contribution/",
+      views.submit_project_contribution,
+      name="submit_project_contribution"
+    ),
 
 
 ]

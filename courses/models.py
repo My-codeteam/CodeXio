@@ -315,3 +315,57 @@ class CompletedCourse(models.Model):
 
     def __str__(self):
         return f"{self.user.username} completed {self.course.title}"
+
+class ProjectContribution(models.Model):
+
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    )
+
+
+    student = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    github_username = models.CharField(
+        max_length=100
+    )
+
+    project_name = models.CharField(
+        max_length=200
+    )
+
+    project_link = models.URLField()
+
+    contribution_description = models.TextField()
+
+
+    grade = models.PositiveIntegerField(
+        default=0
+    )
+
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+
+    submitted_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+
+    reviewed_at = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+
+
+    def __str__(self):
+
+        return f"{self.student.username} - {self.project_name}"
