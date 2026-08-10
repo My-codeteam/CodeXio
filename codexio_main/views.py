@@ -29,6 +29,7 @@ from django.utils.html import strip_tags
 from django.db.models import F
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.db.models import Exists, OuterRef
 # from services.resend_service import send_email
 
 # Download the nltk data if not already downloaded
@@ -1044,6 +1045,16 @@ def live_courses(request):
         course_type="live"
     )
 
+    if request.user.is_authenticated:
+        enrollments = Enrollment.objects.filter(
+            user=request.user,
+            course=OuterRef("pk")
+        )
+
+        open_courses = open_courses.annotate(
+            enrolled=Exists(enrollments)
+        )
+
     context = {
         "upcoming_courses": upcoming_courses,
         "open_courses": open_courses,
@@ -1057,12 +1068,46 @@ def live_courses(request):
 def project_showcase(request):
 
     url = "https://api.github.com/users/codexmingleteam-sudo/repos"
-    response = requests.get(url)
 
-    projects = response.json()
+    headers = {
+        "Authorization": f"Bearer {settings.GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json",
+    }
+
+    try:
+
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=10
+        )
+
+        if response.status_code == 200:
+
+            projects = response.json()
+
+        else:
+
+            projects = []
+
+            print(
+                f"GitHub API error: "
+                f"{response.status_code} - "
+                f"{response.text}"
+            )
+
+    except requests.RequestException as e:
+
+        projects = []
+
+        print(f"GitHub connection error: {e}")
 
     context = {
         "projects": projects
     }
 
-    return render(request, "codexio_main/dashboard/projects.html", context)
+    return render(
+        request,
+        "codexio_main/dashboard/projects.html",
+        context
+    )
