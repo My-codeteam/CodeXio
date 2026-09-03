@@ -546,6 +546,7 @@ You can ask:
 • Where are ebooks
 • How to get certificates
 • How to join community
+• About Codexmingle
 <p>
 {% if updates %}
 
@@ -631,7 +632,7 @@ if(userText.includes("hi")){
 }
 
 if(userText.includes("course")){
-botReply="You can view your courses in the Courses section on the sidebar."
+botReply="You can view all courses in the Courses section on the sidebar. For your enrolled courses, it is easily accessed on the enrolled page through the side menu."
 }
 
 else if(userText.includes("assignment")){
@@ -639,21 +640,24 @@ botReply="To submit assignments, go to the course module page and upload your a 
 }
 
 else if(userText.includes("certificate")){
-botReply="Certificates appear after completing a course. Check the Certificates section."
+botReply="Certificates appear after completing a course. Check the Certificates section on the side menu."
 }
 
 else if(userText.includes("ebook") || userText.includes("book")){
-botReply="Learning materials can be downloaded through the Ebook link in the navigation menu."
+botReply="Learning materials can be downloaded through the Ebook link in the navigation menu. This link currently takes you to a different web page."
 }
 
 else if(userText.includes("community")){
-botReply="You can join CodexMingle's learning community through the Community link in the navigation."
+botReply="You can join CodexMingle's learning community on slack through the Community link in the navigation. This will lead you to a form which which will definitely ask for user id, live course applied for, and proof of payment, along with some other neccessary questions."
 }
 
 else if(userText.includes("help")){
-botReply="I can help with courses, assignments, ebooks, certificates, and community."
+botReply="I can help with courses, assignments, ebooks, certificates, and community. If your question is not here, you can kindly reach out in mail directly or simply use the feedback page on the navigation menu. You will be attented to in time by my friends."
 }
 
+else if(userText.includes("codexmingle")){
+    botReply= "Codexmingle is a technology ecosystem where people learn, collaborate, build real projects, develop reputations, connect with mentors, and eventually get discovered by companies."
+}
 
 chat.innerHTML += "<br><b>Nexora:</b> "+botReply+"<br>"
 
