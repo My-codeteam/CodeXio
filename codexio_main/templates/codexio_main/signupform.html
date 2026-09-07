@@ -204,6 +204,10 @@
       <form method="POST">
         {% csrf_token %}
 
+        {% if request.GET.next %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+
         <input type="text" name="username" placeholder="Username" value="{{ data.username|default:'' }}">
         <input type="password" name="password" placeholder="Password">
 
@@ -213,7 +217,7 @@
         <a href="{% url 'users:password_reset_request' %}" style="color: #ff6666; text-decoration: none;">Forgot password?</a>
       </p>
     </div>
-     
+
     <div id="register-form" class="form-box hidden">
       <h2>Register</h2>
       <form method="POST">

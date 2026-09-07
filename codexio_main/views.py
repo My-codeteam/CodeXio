@@ -4,6 +4,7 @@ from nltk.chat.util import Chat, reflections
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import *
+from django.utils.http import url_has_allowed_host_and_scheme
 from assignments.models import Submission
 from users.models import User, EmailVerification, StudentReputation
 from django.db.models.functions import Now
@@ -489,10 +490,27 @@ def signup(request):
 
             login(request, user)
 
+            next_url = request.POST.get("next") or request.GET.get("next")
+
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure()
+            ):
+               return redirect(next_url)
+
+
             last_page = request.session.get("last_page")
 
-            if last_page:
-               return redirect(last_page["url"])
+            if isinstance(last_page, dict):
+                last_url = last_page.get("url")
+
+                if last_url and url_has_allowed_host_and_scheme(
+                    last_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure()
+                ):
+                    return redirect(last_url)
 
             if user.is_staff or user.is_superuser:
                 return redirect("courses:admin_dashboard")
