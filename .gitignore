@@ -2,3 +2,11 @@
 __pycache__/
 staticfiles/
 venv/
+env/
+.venv/
+ENV/
+.codeXio/
+.vscode/
+
+# Ignore virtualenvs in subfolders
+*/env/

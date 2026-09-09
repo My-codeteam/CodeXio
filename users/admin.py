@@ -4,3 +4,4 @@ from .models import *
 admin.site.register(User)
 admin.site.register(EmailVerification)
 admin.site.register(StudentReputation)
+admin.site.register(PasswordReset)

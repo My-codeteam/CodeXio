@@ -4,6 +4,8 @@ from nltk.chat.util import Chat, reflections
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from .models import *
+from django.utils.http import url_has_allowed_host_and_scheme
+from assignments.models import Submission
 from users.models import User, EmailVerification, StudentReputation
 from django.db.models.functions import Now
 from datetime import timedelta
@@ -14,7 +16,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Count
 
 User = get_user_model()
-from courses.models import Course, Enrollment, UpdateNotification, Module, CompletedCourse
+from courses.models import Course, Enrollment, UpdateNotification, Module, CompletedCourse, MentorRequest, ProjectContribution
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from assignments.models import Assignment
@@ -26,6 +28,9 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.db.models import F
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.db.models import Exists, OuterRef
 # from services.resend_service import send_email
 
 # Download the nltk data if not already downloaded
@@ -147,9 +152,43 @@ def home(request):
     visit_obj.save()
 
     visit_obj.refresh_from_db()
+
+    testimonials = Testimonial.objects.filter(
+    approved=True)[:6]
     return render(request, 'codexio_main/index.html', {
-        "visits": visit_obj.count
+        "visits": visit_obj.count, "testimonials": testimonials
     })
+
+
+def testimonial(request):
+
+    if request.method == "POST":
+
+        Testimonial.objects.create(
+
+            name=request.POST["name"],
+
+            email=request.POST.get("email"),
+
+            country=request.POST["country"],
+
+            rating=request.POST.get("rating", 5),
+
+            comment=request.POST["comment"]
+
+        )
+
+        messages.success(
+            request,
+            "Thank you! Your review has been submitted and will appear after approval. Please kindly be patient."
+        )
+
+        return redirect("/testimonial")
+
+    return render(
+        request,
+        "codexio_main/testimonial.html"
+    )
 
 @login_required
 def feedback(request):
@@ -297,6 +336,10 @@ def student_portal(request):
 
     courses = Course.objects.order_by("-id")[:6]
 
+    UpdateNotification.objects.filter(
+        created_at__lt=timezone.now() - timedelta(days=5)
+    ).delete()
+
     updates = UpdateNotification.objects.all()
 
 
@@ -357,127 +400,267 @@ def student_portal(request):
     )
 
 
+@login_required
+def my_submissions(request):
+
+    submissions = (
+        Submission.objects
+        .filter(student=request.user)
+        .select_related(
+            "assignment",
+            "assignment__module",
+            "assignment__module__course"
+        )
+        .order_by("-submitted_at")
+    )
+
+    context = {
+        "submissions": submissions
+    }
+
+    return render(
+        request,
+        "codexio_main/dashboard/submissions/my_submissions.html",
+        context
+    )
+
 def signup(request):
 
+    context = {
+        "form_type": "login",
+        "data": {}
+    }
+
     if request.method == "POST":
+
+        context["data"] = request.POST
 
         # LOGIN
         if "login_submit" in request.POST:
 
-            username = request.POST.get("username")
-            password = request.POST.get("password")
+            context["form_type"] = "login"
 
-            user = authenticate(request, username=username, password=password)
+            username = request.POST.get("username", "").strip()
+            password = request.POST.get("password", "").strip()
 
-            if user is not None:
-
-                if not user.is_verified:
-
-                    messages.error(
-                        request,
-                        "Please verify your email first."
-                    )
-
-                    return redirect("/signup")
-
-                login(request, user)
-
-                if user.is_staff or user.is_superuser:
-                    return redirect("courses:admin_dashboard")
-
-                return redirect("/student_portal")
-
-            else:
+            if not username or not password:
 
                 messages.error(
                     request,
-                    "Invalid username or password"
+                    "Username and password are required."
                 )
 
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            user = authenticate(
+                request,
+                username=username,
+                password=password
+            )
+
+            if user is None:
+
+                messages.error(
+                    request,
+                    "Invalid username or password."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            if not user.is_verified:
+
+                messages.error(
+                    request,
+                    "Please verify your email before logging in."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            login(request, user)
+
+            next_url = request.POST.get("next") or request.GET.get("next")
+
+            if next_url and url_has_allowed_host_and_scheme(
+                next_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure()
+            ):
+               return redirect(next_url)
+
+
+            last_page = request.session.get("last_page")
+
+            if isinstance(last_page, dict):
+                last_url = last_page.get("url")
+
+                if last_url and url_has_allowed_host_and_scheme(
+                    last_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure()
+                ):
+                    return redirect(last_url)
+
+            if user.is_staff or user.is_superuser:
+                return redirect("courses:admin_dashboard")
+
+            return redirect("courses:student_portal")
 
         # REGISTER
-        if "signup_submit" in request.POST:
+        elif "signup_submit" in request.POST:
+
+            context["form_type"] = "register"
 
             username = request.POST.get("username", "").strip()
+            fullname = request.POST.get("fullname", "").strip()
             email = request.POST.get("email", "").strip()
             phone = request.POST.get("phone", "").strip()
             country = request.POST.get("country", "").strip()
-            password = request.POST.get("password", "").strip()
-            fullname = request.POST.get("fullname", "").strip()
-
-            if User.objects.filter(username=username).exists():
-                messages.error(request,"User already exists")
-                return redirect("login_submit")
-
-            if User.objects.filter(email=email).exists():
-                messages.error(request, "Email already exists")
-                return redirect("login_submit")
+            password = request.POST.get("password", "")
+            confirm_password = request.POST.get("confirm_password", "")
 
             if not all([
                 username,
+                fullname,
                 email,
                 phone,
                 country,
                 password,
-                fullname
+                confirm_password
             ]):
 
-               messages.error(
-                  request,
-                  "All fields are required."
-               )
-
-            else:
-
-                user = User.objects.create_user(
-                    username=username,
-                    email=email,
-                    password=password,
-                    phone=phone,
-                    country=country,
-                    fullname=fullname,
-                    is_active=True
+                messages.error(
+                    request,
+                    "All fields are required."
                 )
 
-                verification = EmailVerification.objects.create(
-                   user=user
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
                 )
 
-                verification_link = request.build_absolute_uri(
+            if User.objects.filter(username=username).exists():
+
+                messages.error(
+                    request,
+                    "Username already exists."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            if User.objects.filter(email=email).exists():
+
+                messages.error(
+                    request,
+                    "Email already exists."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            if password != confirm_password:
+
+                messages.error(
+                    request,
+                    "Passwords do not match."
+                )
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            try:
+
+                validate_password(password)
+
+            except ValidationError as e:
+
+                for error in e.messages:
+                    messages.error(request, error)
+
+                return render(
+                    request,
+                    "codexio_main/signupform.html",
+                    context
+                )
+
+            user = User.objects.create_user(
+                username=username,
+                fullname=fullname,
+                email=email,
+                phone=phone,
+                country=country,
+                password=password,
+                is_active=True
+            )
+
+            verification = EmailVerification.objects.create(
+                user=user
+            )
+
+            verification_link = request.build_absolute_uri(
                 f"/verify-email/{verification.token}/"
-                )
+            )
 
-                subject = "Verify Your Email • CodexMingle community"
+            subject = "Verify Your Email • CodexMingle"
 
-                html_content = render_to_string(
-                    "codexio_main/emails/verify_email.html",
-                    {
-                       "user": user,
-                       "verification_link": verification_link
-                    }
-                )
+            html_content = render_to_string(
+                "codexio_main/emails/verify_email.html",
+                {
+                    "user": user,
+                    "verification_link": verification_link
+                }
+            )
 
-                text_content = strip_tags(html_content)
+            text_content = strip_tags(html_content)
 
-                email_message = EmailMultiAlternatives(
-                   subject,
-                   text_content,
-                   settings.DEFAULT_FROM_EMAIL,
-                   [user.email]
-                )
+            email = EmailMultiAlternatives(
+                subject,
+                text_content,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email]
+            )
 
-                email_message.attach_alternative(html_content, "text/html")
+            email.attach_alternative(
+                html_content,
+                "text/html"
+            )
 
-                email_message.send()
+            email.send()
 
-                messages.success(
-                   request,
-                   "Account created successfully. Check your email to verify. If you do not see it in your regular mails, please check your spam folders."
-                )
+            messages.success(
+                request,
+                "Account created successfully. Check your email to verify. If you do not see it in your regular mails, please check your spam folders."
+            )
 
-                return redirect("/signup")
+            return redirect("/signup")
 
-    return render(request, "codexio_main/signupform.html")
+    return render(
+        request,
+        "codexio_main/signupform.html",
+        context
+    )
 
 def verify_email(request, token):
 
@@ -486,15 +669,30 @@ def verify_email(request, token):
         token=token
     )
 
+    if verification.verified:
+        messages.info(request, "Email already verified.")
+        return redirect("/signup")
+
+    if verification.is_expired:
+
+        user = verification.user
+
+        user.delete()
+
+        messages.error(
+            request,
+            "Verification link expired. Please register again."
+        )
+
+        return redirect("/signup")
+
     verification.verified = True
     verification.save()
 
     user = verification.user
 
     user.is_verified = True
-
-    user.verified_at = now()
-
+    user.verified_at = timezone.now()
     user.save()
 
     messages.success(
@@ -538,6 +736,15 @@ def admin_dashboard(request):
 
     modules = Module.objects.select_related('course').all()
 
+    requests = MentorRequest.objects.select_related(
+        "user",
+        "course"
+    ).order_by("-created_at")
+
+    contributions = ProjectContribution.objects.all().order_by(
+    "-submitted_at"
+    )
+
     if query:
         users = User.objects.filter(username__icontains=query)
         courses = Course.objects.filter(title__icontains=query)
@@ -546,10 +753,79 @@ def admin_dashboard(request):
         "users": users,
         "courses": courses,
         "modules": modules,
-        "query": query
+        "query": query,
+        "requests": requests,
+        "contributions": contributions,
     }
 
     return render(request, "codexio_main/dashboard/admin_panel/admin.html", context)
+
+@staff_member_required
+def approve_project_contribution(request, contribution_id):
+
+    contribution = get_object_or_404(
+        ProjectContribution,
+        id=contribution_id
+    )
+
+    if contribution.status == "approved":
+        messages.warning(
+            request,
+            "This contribution has already been approved."
+        )
+        return redirect("admin_dashboard")
+
+    grade = int(request.POST.get("grade"))
+
+    contribution.grade = grade
+    contribution.status = "approved"
+    contribution.reviewed_at = timezone.now()
+    contribution.save()
+
+    reputation, created = StudentReputation.objects.get_or_create(
+        user=contribution.student
+    )
+
+    reputation.github_contributions += 1
+    reputation.project_contribution_grade += grade
+
+    reputation.calculate_score()
+
+    messages.success(
+        request,
+        "Contribution approved and reputation updated."
+    )
+
+
+    return redirect(
+        "courses:admin_dashboard"
+    )
+
+@staff_member_required
+def reject_project_contribution(request, contribution_id):
+
+    contribution = get_object_or_404(
+        ProjectContribution,
+        id=contribution_id
+    )
+
+    if contribution.status == "approved":
+        messages.warning(
+            request,
+            "This contribution has already been approved."
+        )
+        return redirect("admin_dashboard")
+
+    contribution.status = "rejected"
+    contribution.reviewed_at = timezone.now()
+    contribution.save()
+
+    messages.success(
+        request,
+        "Project contribution rejected."
+    )
+
+    return redirect("admin_dashboard")
 
 @staff_member_required
 def create_course(request):
@@ -653,7 +929,7 @@ def create_module(request):
             order=order
         )
 
-    return redirect("courses:admin_dashboard")
+    return redirect('courses:admin_dashboard')
 
 @staff_member_required
 def create_assignment(request):
@@ -665,7 +941,7 @@ def create_assignment(request):
         instructions = request.POST.get("instructions")
 
         if not module_id:
-            return redirect("courses:admin_dashboard")
+            return redirect('courses:admin_dashboard')
 
         module = get_object_or_404(Module, id=module_id)
 
@@ -675,7 +951,94 @@ def create_assignment(request):
             description=instructions
         )
 
-    return redirect("courses:admin_dashboard")
+    return redirect('courses:admin_dashboard')
+
+@staff_member_required
+def approve_mentor_request(request, request_id):
+
+    mentor_request = get_object_or_404(
+        MentorRequest,
+        id=request_id
+    )
+
+    mentor_request.status = "approved"
+    mentor_request.save()
+
+    messages.success(
+        request,
+        "Mentor request approved."
+    )
+
+    return redirect('courses:admin_dashboard')
+
+@staff_member_required
+def reject_mentor_request(request, request_id):
+
+    mentor_request = get_object_or_404(
+        MentorRequest,
+        id=request_id
+    )
+
+    mentor_request.status = "rejected"
+    mentor_request.save()
+
+    messages.success(
+        request,
+        "Mentor request rejected."
+    )
+
+    return redirect('courses:admin_dashboard')
+
+@staff_member_required
+def complete_mentor_request(request, request_id):
+
+    mentor_request = get_object_or_404(
+        MentorRequest,
+        id=request_id
+    )
+
+    if mentor_request.status != "completed":
+
+        mentor_request.status = "completed"
+        mentor_request.save()
+
+        reputation, _ = StudentReputation.objects.get_or_create(
+            user=mentor_request.user
+        )
+
+        reputation.mentor_sessions += 1
+        reputation.calculate_score()
+
+    messages.success(
+        request,
+        "Mentor session completed."
+    )
+
+    return redirect('courses:admin_dashboard')
+
+@staff_member_required
+def assignment_submissions(request):
+
+    submissions = (
+        Submission.objects
+        .select_related(
+            "student",
+            "assignment",
+            "assignment__module",
+            "assignment__module__course"
+        )
+        .order_by("-submitted_at")
+    )
+
+    context = {
+        "submissions": submissions
+    }
+
+    return render(
+        request,
+        "codexio_main/dashboard/admin_panel/assignment_submissions.html",
+        context
+    )
 
 @login_required
 def live_courses(request):
@@ -700,6 +1063,16 @@ def live_courses(request):
         course_type="live"
     )
 
+    if request.user.is_authenticated:
+        enrollments = Enrollment.objects.filter(
+            user=request.user,
+            course=OuterRef("pk")
+        )
+
+        open_courses = open_courses.annotate(
+            enrolled=Exists(enrollments)
+        )
+
     context = {
         "upcoming_courses": upcoming_courses,
         "open_courses": open_courses,
@@ -713,12 +1086,46 @@ def live_courses(request):
 def project_showcase(request):
 
     url = "https://api.github.com/users/codexmingleteam-sudo/repos"
-    response = requests.get(url)
 
-    projects = response.json()
+    headers = {
+        "Authorization": f"Bearer {settings.GITHUB_TOKEN}",
+        "Accept": "application/vnd.github+json",
+    }
+
+    try:
+
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=10
+        )
+
+        if response.status_code == 200:
+
+            projects = response.json()
+
+        else:
+
+            projects = []
+
+            print(
+                f"GitHub API error: "
+                f"{response.status_code} - "
+                f"{response.text}"
+            )
+
+    except requests.RequestException as e:
+
+        projects = []
+
+        print(f"GitHub connection error: {e}")
 
     context = {
         "projects": projects
     }
 
-    return render(request, "codexio_main/dashboard/projects.html", context)
+    return render(
+        request,
+        "codexio_main/dashboard/projects.html",
+        context
+    )

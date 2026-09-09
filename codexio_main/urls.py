@@ -28,5 +28,43 @@ urlpatterns = [
     "feedback/",
     views.feedback,
     name="feedback"
-    )
+    ),
+    path('testimonial', views.testimonial, name='testimonial'),
+    path(
+    "mentor-requests/<int:request_id>/approve/",
+    views.approve_mentor_request,
+    name="approve_mentor_request",
+    ),
+
+    path(
+    "mentor-requests/<int:request_id>/reject/",
+    views.reject_mentor_request,
+    name="reject_mentor_request",
+    ),
+
+    path(
+    "mentor-requests/<int:request_id>/complete/",
+    views.complete_mentor_request,
+    name="complete_mentor_request",
+    ),
+    path(
+    "assignment-submissions/",
+    views.assignment_submissions,
+    name="assignment_submissions",
+    ),
+    path(
+    "my-submissions/",
+    views.my_submissions,
+    name="my_submissions",
+    ),
+    path(
+    "approve-project-contribution/<int:contribution_id>/",
+    views.approve_project_contribution,
+    name="approve_project_contribution"
+    ),
+    path(
+    "project-contribution/<int:contribution_id>/reject/",
+    views.reject_project_contribution,
+    name="reject_project_contribution"
+    ),
 ]

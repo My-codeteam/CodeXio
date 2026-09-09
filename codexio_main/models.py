@@ -54,3 +54,30 @@ class SiteVisit(models.Model):
 
     def __str__(self):
         return f"Site Visits: {self.count}"
+
+
+
+class Testimonial(models.Model):
+
+    name = models.CharField(max_length=120)
+
+    email = models.EmailField(
+        blank=True,
+        null=True
+    )
+
+    country = models.CharField(max_length=100)
+
+    rating = models.PositiveSmallIntegerField(default=5)
+
+    comment = models.TextField()
+
+    approved = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.name} ({self.country})"

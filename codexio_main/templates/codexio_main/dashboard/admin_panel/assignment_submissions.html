@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="admin-container">
+
+<div class="mentor-card">
+
+<h2>Assignment Submissions</h2>
+
+<table class="mentor-table">
+
+<thead>
+
+<tr>
+
+<th>Student</th>
+
+<th>Course</th>
+
+<th>Module</th>
+
+<th>Assignment</th>
+
+<th>Submission</th>
+
+<th>Submitted</th>
+
+<th>Grade</th>
+
+<th>Feedback</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for submission in submissions %}
+
+<tr>
+
+<td>{{ submission.student.username }}</td>
+
+<td>{{ submission.assignment.module.course.title }}</td>
+
+<td>{{ submission.assignment.module.title }}</td>
+
+<td>{{ submission.assignment.title }}</td>
+
+<td>
+
+<a href="{{ submission.link }}" target="_blank">
+
+View Project
+
+</a>
+
+</td>
+
+<td>{{ submission.submitted_at }}</td>
+
+<td>{{ submission.grade|default:"Not graded" }}</td>
+
+<td> {{ submission.feedback|default:"-" }}</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="8">
+
+No submissions yet.
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+<p>To edit, please make use of the site's admin page.</p>
+
+</div>
+
+{% endblock %}

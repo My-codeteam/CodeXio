@@ -82,6 +82,7 @@ def recruit_home(request):
         StudentReputation.objects
         .select_related("user")
         .filter(user__is_verified=True)
+        .exclude(user__profile_image="")
         .order_by("-total_score")
     )
 
@@ -142,7 +143,7 @@ def talent_detail(request, username):
         user=student
     )
 
-    repositories = get_student_contributions(
+    github_stats = get_student_contributions(
     student.github_username
     )
 
@@ -157,7 +158,7 @@ def talent_detail(request, username):
 
         "completed_courses": completed_courses,
 
-        "repositories": repositories
+        "github_stats": github_stats
 
     }
 

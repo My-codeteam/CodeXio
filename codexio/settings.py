@@ -62,6 +62,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'users.middleware.LastVisitedPageMiddleware',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://codexmingle.pythonanywhere.com",
 ]
 
 ROOT_URLCONF = 'codexio.urls'
@@ -180,3 +185,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 GITHUB_TOKEN = config("GITHUB_TOKEN")
 
 RESEND_API_KEY = config("RESEND_API_KEY")
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True

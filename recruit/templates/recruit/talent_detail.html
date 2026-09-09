@@ -1,6 +1,162 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+.github-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.github-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #111;
+    color: #fff;
+
+    font-size: 24px;
+}
+
+.github-profile span {
+    display: block;
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.github-profile strong {
+    font-size: 16px;
+}
+
+
+/* Statistics */
+
+.github-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.github-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 20px;
+
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.035);
+
+    border: 1px solid rgba(255, 255, 255, 0.07);
+
+    transition: 0.25s ease;
+}
+
+.github-stat-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 59, 59, 0.4);
+}
+
+.github-stat-icon {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: rgba(255, 59, 59, 0.1);
+
+    color: #ff3b3b;
+
+    font-size: 18px;
+}
+
+.github-stat-card strong {
+    display: block;
+
+    font-size: 25px;
+
+    line-height: 1.1;
+
+    color: #fff;
+}
+
+.github-stat-card span {
+    display: block;
+
+    margin-top: 5px;
+
+    font-size: 12px;
+
+    color: #999;
+}
+
+
+/* GitHub status */
+
+.github-status {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    padding: 20px;
+
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.03);
+
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.github-status > i {
+    font-size: 25px;
+    color: #999;
+}
+
+.github-status strong {
+    display: block;
+    color: #fff;
+    margin-bottom: 4px;
+}
+
+.github-status p {
+    margin: 0;
+    color: #888;
+    font-size: 13px;
+}
+
+
+/* Mobile */
+
+@media (max-width: 768px) {
+
+    .github-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .github-stat-card {
+        padding: 16px;
+    }
+
+}
+</style>
 
 <section class="py-5 bg-light">
 
@@ -173,82 +329,154 @@ Verify
 </div>
 
 
+<!-- GitHub Activity -->
 <div class="card border-0 shadow mt-4">
 
 <div class="card-body">
 
-<h4>
+<div class="profile-section">
 
-Github Contributions
+    <div class="section-header">
+        <div>
+            <h3>
+                <i class="fab fa-github"></i>
+                GitHub Activity
+            </h3>
 
-</h4>
+            <p>
+                Contributions to CodexMingle projects
+            </p>
+        </div>
+    </div>
 
-<hr>
 
-{% for repo in repositories %}
+    {% if github_stats.connected %}
 
-<div class="border rounded p-3 mb-3">
+        {% if github_stats.error %}
 
-<h5>
+            <div class="github-status">
+                <i class="fas fa-exclamation-circle"></i>
 
-{{ repo.name }}
+                <div>
+                    <strong>GitHub activity unavailable</strong>
 
-</h5>
+                    <p>
+                        We couldn't retrieve this student's
+                        GitHub activity right now.
+                    </p>
+                </div>
+            </div>
 
-<p>
+        {% else %}
 
-{{ repo.description }}
+            <!-- GitHub Username -->
+            <div class="github-profile">
 
-</p>
+                <div class="github-icon">
+                    <i class="fab fa-github"></i>
+                </div>
 
-<div class="row">
+                <div>
+                    <span>GitHub Username</span>
 
-<div class="col-md-4">
+                    <strong>
+                        {{ github_stats.username }}
+                    </strong>
+                </div>
 
-Language
+            </div>
 
-<br>
 
-<b>{{ repo.language }}</b>
+            <!-- GitHub Statistics -->
+            <div class="github-stats">
+
+                <!-- Projects -->
+                <div class="github-stat-card">
+
+                    <div class="github-stat-icon">
+                        <i class="fas fa-code-branch"></i>
+                    </div>
+
+                    <div>
+                        <strong>
+                            {{ github_stats.projects }}
+                        </strong>
+
+                        <span>
+                            Projects Contributed To
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <!-- Commits -->
+                <div class="github-stat-card">
+
+                    <div class="github-stat-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+
+                    <div>
+                        <strong>
+                            {{ github_stats.commits }}
+                        </strong>
+
+                        <span>
+                            Total Commits
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <!-- Stars -->
+                <div class="github-stat-card">
+
+                    <div class="github-stat-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+
+                    <div>
+                        <strong>
+                            {{ github_stats.stars }}
+                        </strong>
+
+                        <span>
+                            Total Stars
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    {% else %}
+
+        <div class="github-status">
+
+            <i class="fab fa-github"></i>
+
+            <div>
+
+                <strong>
+                    GitHub account not connected
+                </strong>
+
+                <p>
+                    This student has not connected
+                    a GitHub account yet.
+                </p>
+
+            </div>
+
+        </div>
+
+    {% endif %}
 
 </div>
-
-<div class="col-md-4">
-
-Stars
-
-<br>
-
-<b>{{ repo.stars }}</b>
-
-</div>
-
-<div class="col-md-4">
-
-Commits
-
-<br>
-
-<b>{{ repo.contributions }}</b>
-
-</div>
-
-</div>
-
-<br>
-
-<a
-href="{{ repo.repo_url }}"
-target="_blank"
-class="btn btn-dark">
-
-View Repository
-
-</a>
-
-</div>
-
-{% endfor %}
 
 </div>
 

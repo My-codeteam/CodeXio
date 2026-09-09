@@ -154,6 +154,57 @@
     margin-top: 10px;
 }
 
+.testimonials{
+   padding:80px 10%;
+   background:#111826;
+   text-align:center;
+}
+
+.testimonials h2{
+   font-size:2.5rem;
+   margin-bottom:50px;
+}
+
+.testimonial-grid{
+   display:grid;
+   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+   gap:25px;
+}
+
+.testimonial-card{
+   background:#0f141b;
+   padding:25px;
+   border-radius:12px;
+   border:1px solid #222;
+   transition:.3s;
+}
+
+.testimonial-card:hover{
+   transform:translateY(-6px);
+}
+
+.stars{
+   font-size:22px;
+   color:#facc15;
+   margin-bottom:15px;
+}
+
+.comment{
+   font-style:italic;
+   color:#ddd;
+   margin-bottom:20px;
+   line-height:1.7;
+}
+
+.testimonial-card h4{
+   margin:0;
+   color:#fff;
+}
+
+.testimonial-card small{
+   color:#aaa;
+}
+
 </style>
 
 <div class="floating-social">
@@ -175,7 +226,7 @@
     </div>
 
     <ul id="nav-menu">
-    <li><a href="#">Home</a></li>
+    <li><a href="/">Home</a></li>
     <li><a href="/about">About</a></li>
     <li><a href="https://dev.to/codexmingle_community" target="_blank">Blog</a></li>
     {% if not user.is_authenticated %}
@@ -311,9 +362,9 @@
 
     <div class="social-icons">
 
-    <a href="#"><i class="fab fa-github"></i></a>
+    <a href="https://github.com/destiny620"><i class="fab fa-github"></i></a>
 
-    <a href="#"><i class="fab fa-linkedin"></i></a>
+    <a href="https://www.linkedin.com/in/destiny-omorhienrhien?utm_source=share_via&utm_content=profile&utm_medium=member_android"><i class="fab fa-linkedin"></i></a>
 
     </div>
 
@@ -321,7 +372,7 @@
 
     <div class="team-card">
 
-        <img src="{% static 'images/team3.jpg' %}">
+        <img src="{% static "codexio_main/images/team-pics/team-9.jpeg" %}">
 
         <h4>Michelle Rodriguez</h4>
 
@@ -378,6 +429,84 @@
              <a href="https://www.linkedin.com/in/petercontent?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank"><i class="fab fa-linkedin"></i></a>
             </div>
         </div>
+        <div class="team-card">
+            <img src="{% static "codexio_main/images/team-pics/team-7.png" %}" alt="team pic">
+            <h4>Victory Osunwa</h4>
+            <p>Social Media Manager/Business Developer/ AI prompt Engineer</p>
+            <p>Creates engaging posts and promotes contents from Codexmingle.</p>
+            <div class="social-icons">
+             <a href="https://github.com/ameliadeveloper" target="_blank"><i class="fab fa-github"></i></a>
+             <a href="https://x.com/AmeliaTheBD" target="_blank"><i class="fab fa-brands fa-twitter"></i></a>
+            </div>
+        </div>
+        <div class="team-card">
+            <img src="{% static "codexio_main/images/team-pics/team-8.jpg" %}" alt="team pic" alt="team pic">
+            <h4>John Kiddo</h4>
+            <p>Graphics Designer and Photo Editor</p>
+            <p>Creates digital flyers and banners for Codexmingle's contents and events.</p>
+            <div class="social-icons">
+             <a href="#" target="_blank"><i class="fa-brands fa-facebook"></i></a>
+             <a href="" target="_blank"><i class="fab fa-brands fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<section class="testimonials">
+
+    <h2>What Our Community Says</h2>
+
+    <div class="testimonial-grid">
+
+       {% for review in testimonials %}
+
+       <div class="testimonial-card">
+
+           <div class="stars">
+
+           {% for i in "12345" %}
+
+           {% if forloop.counter <= review.rating %}
+           ★
+           {% else %}
+           ☆
+           {% endif %}
+
+           {% endfor %}
+
+           </div>
+
+           <p class="comment">
+
+           "{{ review.comment }}"
+
+           </p>
+
+           <h4>{{ review.name }}</h4>
+
+           <small>{{ review.country }}</small>
+
+        </div>
+
+        {% empty %}
+
+        <p>
+           Be the first person to leave a review.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+    <div style="margin-top:40px;text-align:center;">
+
+    <a href="{% url 'courses:testimonial' %}" class="btn btn-primary">
+
+       Leave a Review
+
+    </a>
+
     </div>
 
 </section>

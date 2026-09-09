@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.timezone import now
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 # Create your models here.
 from django.contrib.auth.models import AbstractUser
@@ -42,7 +44,6 @@ class User(AbstractUser):
 
             self.student_id = f"CM-{year}-{new_number:04d}"
 
-        super().save(*args, **kwargs)
 
         if not self.github_username:
 
@@ -73,6 +74,34 @@ class EmailVerification(models.Model):
     def __str__(self):
         return self.user.username
 
+    @property
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=10)
+
+
+class PasswordReset(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='password_resets'
+    )
+
+    code = models.CharField(max_length=6)
+
+    is_used = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    expires_at = models.DateTimeField()
+
+    def __str__(self):
+        return f"Password reset for {self.user.email}"
+
+    def is_valid(self):
+        from django.utils.timezone import now
+        return not self.is_used and now() < self.expires_at
+
 
 class StudentReputation(models.Model):
 
@@ -91,6 +120,8 @@ class StudentReputation(models.Model):
 
     mentor_sessions = models.IntegerField(default=0)
 
+    project_contribution_grade = models.IntegerField(default=0)
+
     total_score = models.IntegerField(default=0)
 
     updated_at = models.DateTimeField(auto_now=True)
@@ -99,15 +130,15 @@ class StudentReputation(models.Model):
 
         self.total_score = (
 
-            (self.completed_courses * 10)
+            (self.completed_courses * 5)
 
             +
 
-            (self.github_contributions * 1)
+            (self.github_contributions * 25)
 
             +
 
-            (self.assignments_submitted * 2)
+            (self.assignments_submitted * 10)
 
             +
 
@@ -115,7 +146,11 @@ class StudentReputation(models.Model):
 
             +
 
-            (self.mentor_sessions * 5)
+            (self.mentor_sessions * 2)
+
+            +
+
+            self.project_contribution_grade
 
         )
 

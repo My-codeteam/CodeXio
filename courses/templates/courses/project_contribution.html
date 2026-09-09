@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+body{
+    background:#0c1117;
+    color:white;
+    font-family:Segoe UI, Arial, sans-serif;
+}
+
+/* MAIN CONTAINER */
+
+.contribution-container{
+    max-width:850px;
+    margin:0 auto;
+    padding:50px 20px;
+}
+
+/* HEADER */
+
+.contribution-header{
+    margin-bottom:30px;
+}
+
+.contribution-header h2{
+    font-size:32px;
+    margin:0 0 10px;
+}
+
+.contribution-header p{
+    color:#9ca3af;
+    line-height:1.6;
+    margin:0;
+}
+
+/* CARD */
+
+.contribution-card{
+    background:#111826;
+    border:1px solid #1f2937;
+    border-radius:16px;
+    padding:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+/* INFORMATION BOX */
+
+.info-box{
+    background:#1a1111;
+    border:1px solid #4a2020;
+    border-left:4px solid #ff3b3b;
+    padding:15px 18px;
+    border-radius:8px;
+    margin-bottom:25px;
+}
+
+.info-box strong{
+    color:#ff5555;
+}
+
+.info-box p{
+    margin:6px 0 0;
+    color:#c4ccd6;
+    font-size:14px;
+    line-height:1.6;
+}
+
+/* FORM */
+
+.form-group{
+    margin-bottom:20px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-size:14px;
+    font-weight:600;
+    color:#e5e7eb;
+}
+
+.form-group input,
+.form-group textarea{
+    width:100%;
+    box-sizing:border-box;
+    padding:14px;
+    border-radius:9px;
+    border:1px solid #293241;
+    background:#0c1117;
+    color:white;
+    font-size:15px;
+    outline:none;
+    transition:0.25s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus{
+    border-color:#ff3b3b;
+    box-shadow:0 0 0 3px rgba(255,59,59,0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder{
+    color:#6b7280;
+}
+
+.form-group textarea{
+    min-height:130px;
+    resize:vertical;
+}
+
+/* SUBMIT BUTTON */
+
+.submit-contribution-btn{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:9px;
+    background:#ff3b3b;
+    color:white;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:0.25s;
+}
+
+.submit-contribution-btn:hover{
+    background:#e62f2f;
+    transform:translateY(-1px);
+}
+
+.submit-contribution-btn:active{
+    transform:translateY(0);
+}
+
+/* FOOTNOTE */
+
+.form-note{
+    text-align:center;
+    margin-top:18px;
+    color:#6b7280;
+    font-size:13px;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+    .contribution-container{
+        padding:30px 15px;
+    }
+
+    .contribution-card{
+        padding:20px;
+    }
+
+    .contribution-header h2{
+        font-size:25px;
+    }
+
+}
+
+</style>
+
+
+<div class="contribution-container">
+
+    <div class="contribution-header">
+
+        <h2>
+            Submit Project Contribution
+        </h2>
+
+        <p>
+            Tell us about a project you are actively contributing to.
+            Your submission will be reviewed by the CodexMingle team
+            before contribution points are awarded.
+        </p>
+
+    </div>
+
+
+    <div class="contribution-card">
+
+        <div class="info-box">
+
+            <strong>How it works</strong>
+
+            <p>
+                Submit a project you have genuinely contributed to.
+                Our team will verify your participation and assign
+                a contribution score based on the quality and extent
+                of your work.
+            </p>
+
+        </div>
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="form-group">
+
+                <label for="github_username">
+                    GitHub Username
+                </label>
+
+                <input
+                    type="text"
+                    id="github_username"
+                    name="github_username"
+                    placeholder="e.g. Johndoe"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="project_name">
+                    Project Name
+                </label>
+
+                <input
+                    type="text"
+                    id="project_name"
+                    name="project_name"
+                    placeholder="Enter the name of the project"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="project_link">
+                    Project Link
+                </label>
+
+                <input
+                    type="url"
+                    id="project_link"
+                    name="project_link"
+                    placeholder="https://github.com/username/project"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="description">
+                    Describe Your Contribution
+                </label>
+
+                <textarea
+                    id="description"
+                    name="description"
+                    placeholder="Describe what you worked on, the features you built, issues you solved, or other contributions you made."
+                ></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="submit-contribution-btn"
+            >
+                Submit Contribution
+            </button>
+
+        </form>
+
+
+        <div class="form-note">
+            Contribution scores are reviewed manually to ensure fair scoring.
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
