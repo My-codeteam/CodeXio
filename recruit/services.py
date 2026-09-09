@@ -4,71 +4,180 @@ from django.conf import settings
 
 ORG_NAME = "codexmingleteam-sudo"
 
+GITHUB_HEADERS = {
+    "Authorization": f"Bearer {settings.GITHUB_TOKEN}",
+    "Accept": "application/vnd.github+json",
+}
+
 
 def get_student_contributions(username):
+    """
+    Get a student's GitHub activity within the CodexMingle GitHub organization.
 
-    headers = {
-        "Authorization": f"Bearer {settings.GITHUB_TOKEN}",
-        "Accept": "application/vnd.github+json"
-    }
+    Returns:
+        {
+            "projects": int,
+            "commits": int,
+            "stars": int,
+            "username": str,
+            "connected": bool,
+            "error": bool,
+        }
+    """
 
-    repos_url = f"https://api.github.com/orgs/{ORG_NAME}/repos"
+    # Student has not connected a GitHub account
+    if not username:
+        return {
+            "projects": 0,
+            "commits": 0,
+            "stars": 0,
+            "username": None,
+            "connected": False,
+            "error": False,
+        }
 
-    response = requests.get(repos_url, headers=headers)
+    projects = 0
+    total_commits = 0
+    total_stars = 0
 
-    if response.status_code != 200:
-        print("GitHub Repo Error:", response.status_code, response.text)
-        return []
+    page = 1
 
-    repositories = response.json()
+    while True:
 
-    contributed_repos = []
-
-    for repo in repositories:
-
-        contributors_url = repo.get("contributors_url")
-
-        if not contributors_url:
-            continue
+        repos_url = (
+            f"https://api.github.com/orgs/{ORG_NAME}/repos"
+            f"?per_page=100&page={page}"
+        )
 
         try:
-            contributor_response = requests.get(
-                contributors_url,
-                headers=headers,
+            response = requests.get(
+                repos_url,
+                headers=GITHUB_HEADERS,
                 timeout=10
             )
-        except Exception as e:
-            print("Request failed:", e)
-            continue
+        except requests.RequestException as e:
+            print("GitHub Repository Request Error:", e)
 
-        if contributor_response.status_code != 200:
-            continue
+            return {
+                "projects": 0,
+                "commits": 0,
+                "stars": 0,
+                "username": username,
+                "connected": True,
+                "error": True,
+            }
 
-        try:
-            contributors = contributor_response.json()
-        except Exception:
-            continue
+        if response.status_code != 200:
+            print(
+                "GitHub Repo Error:",
+                response.status_code,
+                response.text
+            )
 
-        for contributor in contributors:
+            return {
+                "projects": 0,
+                "commits": 0,
+                "stars": 0,
+                "username": username,
+                "connected": True,
+                "error": True,
+            }
 
-            if contributor.get("login", "").lower() == username.lower():
+        repositories = response.json()
 
-                contributed_repos.append({
-                    "name": repo.get("name"),
-                    "description": repo.get("description"),
-                    "language": repo.get("language"),
-                    "stars": repo.get("stargazers_count", 0),
-                    "updated_at": repo.get("updated_at"),
-                    "repo_url": repo.get("html_url"),
-                    "contributions": contributor.get("contributions", 0)
-                })
+        if not repositories:
+            break
 
-                break
+        for repo in repositories:
 
-    print("Found repos:", len(contributed_repos))
+            contributors_url = repo.get("contributors_url")
 
-    return sorted(
-        contributed_repos,
-        key=lambda x: x["updated_at"] or "",
-        reverse=True
-    )
+            if not contributors_url:
+                continue
+
+            contributor_page = 1
+
+            while True:
+
+                url = (
+                    f"{contributors_url}"
+                    f"?per_page=100&page={contributor_page}"
+                )
+
+                try:
+                    contributor_response = requests.get(
+                        url,
+                        headers=GITHUB_HEADERS,
+                        timeout=10
+                    )
+                except requests.RequestException as e:
+                    print(
+                        "GitHub Contributor Request Error:",
+                        e
+                    )
+                    break
+
+                if contributor_response.status_code != 200:
+                    print(
+                        "GitHub Contributor Error:",
+                        contributor_response.status_code
+                    )
+                    break
+
+                try:
+                    contributors = contributor_response.json()
+                except ValueError:
+                    break
+
+                if not contributors:
+                    break
+
+                found_student = False
+
+                for contributor in contributors:
+
+                    contributor_username = contributor.get("login", "")
+
+                    if contributor_username.lower() == username.lower():
+
+                        projects += 1
+
+                        total_commits += contributor.get(
+                            "contributions",
+                            0
+                        )
+
+                        total_stars += repo.get(
+                            "stargazers_count",
+                            0
+                        )
+
+                        found_student = True
+                        break
+
+                # We found the student in this repository.
+                if found_student:
+                    break
+
+                # If fewer than 100 contributors were returned,
+                # there is no next page.
+                if len(contributors) < 100:
+                    break
+
+                contributor_page += 1
+
+        # If fewer than 100 repositories were returned,
+        # there is no next page.
+        if len(repositories) < 100:
+            break
+
+        page += 1
+
+    return {
+        "projects": projects,
+        "commits": total_commits,
+        "stars": total_stars,
+        "username": username,
+        "connected": True,
+        "error": False,
+    }

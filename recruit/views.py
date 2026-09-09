@@ -143,7 +143,7 @@ def talent_detail(request, username):
         user=student
     )
 
-    repositories = get_student_contributions(
+    github_stats = get_student_contributions(
     student.github_username
     )
 
@@ -158,7 +158,7 @@ def talent_detail(request, username):
 
         "completed_courses": completed_courses,
 
-        "repositories": repositories
+        "github_stats": github_stats
 
     }
 
