@@ -254,11 +254,11 @@ Each learner has a reputation score that reflects their activity and contributio
 Reputation Formula
 
 score = (
-    completed_courses * 10
-    + github_contributions * 1
-    + assignments_submitted * 2
+    completed_courses * 5
+    + github_contributions * 25 + project_contribution_grade
+    + assignments_submitted * 10
     + live_attendance * 3
-    + mentor_sessions * 5
+    + mentor_sessions * 2
 )
 
 Purpose
