@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 
+{% block css_files %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    {% comment %} <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/> {% endcomment %}
+{% endblock %}
+
 {% block content %}
 <style>
 .github-profile {
@@ -43,6 +50,7 @@
 /* Statistics */
 
 .github-stats {
+    color: black;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
@@ -112,6 +120,7 @@
 /* GitHub status */
 
 .github-status {
+    color: black;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -355,7 +364,7 @@ Verify
         {% if github_stats.error %}
 
             <div class="github-status">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fa-solid fa-circle-exclamation"></i>
 
                 <div>
                     <strong>GitHub activity unavailable</strong>
@@ -363,6 +372,9 @@ Verify
                     <p>
                         We couldn't retrieve this student's
                         GitHub activity right now.
+                    </p>
+                    <p>
+                       {{ github_stats.error_message }}
                     </p>
                 </div>
             </div>
@@ -399,7 +411,7 @@ Verify
 
                     <div>
                         <strong>
-                            {{ github_stats.projects }}
+                            {{ github_stats.projects_contributed }}
                         </strong>
 
                         <span>
@@ -419,7 +431,7 @@ Verify
 
                     <div>
                         <strong>
-                            {{ github_stats.commits }}
+                            {{ github_stats.total_commits }}
                         </strong>
 
                         <span>
@@ -439,7 +451,7 @@ Verify
 
                     <div>
                         <strong>
-                            {{ github_stats.stars }}
+                            {{ github_stats.total_stars }}
                         </strong>
 
                         <span>
